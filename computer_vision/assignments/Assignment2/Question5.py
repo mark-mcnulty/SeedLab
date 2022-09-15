@@ -8,11 +8,12 @@ if __name__ == "__main__":
     # capture images continuously
     # till the user presses the q key
     while True:
+        name = "temp.jpg"
         # capture an image 
-        cam.capture("temp.jpg")
+        cam.capture(name)
 
         # see if the image contains an aruco marker
-        id = cam.detect_aruco()
+        id = cam.detect_markers(name)
 
         # if the image contains an aruco marker
         if id == None:
