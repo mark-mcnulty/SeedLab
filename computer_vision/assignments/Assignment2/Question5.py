@@ -16,7 +16,9 @@ if __name__ == "__main__":
         id = cam.detect_markers(name)
 
         # if the image contains an aruco marker
-        if id == None:
+        if id == []:
             print("No marker found")
         else:
             print("Marker found: ", id)
+
+        # check if the user pressed the q key
