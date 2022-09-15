@@ -16,7 +16,7 @@ if __name__ == "__main__":
         id = cam.detect_markers(name)
 
         # if the image contains an aruco marker
-        if id == []:
+        if id == [[]]:
             print("No marker found")
         else:
             print("Marker found: ", id)
