@@ -74,11 +74,14 @@ class arducam:
         parameters =  cv2.aruco.DetectorParameters_create()
         corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
 
-        # draw the markers
-        img = cv2.aruco.drawDetectedMarkers(img, corners, ids)
+        # return the ids of the markers
+        return ids
 
-        # save the image
-        cv2.imwrite("new"+name, img)
+        # # draw the markers
+        # img = cv2.aruco.drawDetectedMarkers(img, corners, ids)
+
+        # # save the image
+        # cv2.imwrite("new"+name, img)
 
 if __name__ == "__main__":
     print("main")
