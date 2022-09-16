@@ -4,9 +4,13 @@ import cv2
 import numpy
 
 class arducam:
+    '''
+    About Camera: https://www.raspberrypi.com/documentation/accessories/camera.html
+    '''
     # define a function to initalize the object 
     def __init__(self):
         self.camera = picamera.PiCamera()
+        self.FV = 53.50
         time.sleep(2)
 
     # define a function to capture images with the camera
@@ -75,13 +79,12 @@ class arducam:
         corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
 
         # return the ids of the markers
-        return ids
+        # understanding corners:
+        #                        corners[0][0][0][0] -> x
+        #                        corners[0][0][0][1] -> y
+        #                        corners[0][0][1][0] -> 2nd corner of the id marker 0
+        return ids, corners
 
-        # # draw the markers
-        # img = cv2.aruco.drawDetectedMarkers(img, corners, ids)
-
-        # # save the image
-        # cv2.imwrite("new"+name, img)
 
 if __name__ == "__main__":
     print("main")
