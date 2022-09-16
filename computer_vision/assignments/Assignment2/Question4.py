@@ -66,10 +66,11 @@ def detect_markers(name):
     cv2.imwrite("new"+name, img)
 
 if __name__ == "__main__":
-    for i in range(1, 5+1):
+    num = 6
+    for i in range(1, num+1):
         convert_to_grayscale(f"{i}.jpg")
     
-    for i in range(1, 5+1):
+    for i in range(1, num+1):
         detect_markers(f"{i}.jpg")
 
 
