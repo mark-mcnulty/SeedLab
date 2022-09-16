@@ -66,6 +66,6 @@ def get_marker_location(name):
 # in this function, you should detect the aruco marker
 # and return the id of the marker
 if __name__ == "__main__":
-    print(get_marker_location("2"))
+    print(get_marker_location("6"))
 
     
