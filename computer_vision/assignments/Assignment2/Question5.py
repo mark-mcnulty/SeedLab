@@ -13,7 +13,7 @@ if __name__ == "__main__":
         cam.capture(name)
 
         # see if the image contains an aruco marker
-        id = cam.detect_markers(name)
+        id, corners = cam.detect_markers(name)
 
         # if the image contains an aruco marker
         if id == None:
