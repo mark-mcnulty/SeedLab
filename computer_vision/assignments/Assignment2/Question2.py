@@ -13,7 +13,7 @@ def resize_image(name):
     h, w, c = img.shape
     
     # save the image
-    cv2.imwrite(name, img)
+    cv2.imwrite("newSize"+name, img)
     
 if __name__ == "__main__":
     print()
