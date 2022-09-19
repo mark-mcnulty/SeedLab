@@ -31,23 +31,26 @@ def get_marker_location(name):
 
     # check if markers were found
     if ids is not None:
-        # find the mix right side and min left side
-        min_x = 100000
-        max_x = 0
-        for i in range(len(corners[0][0])):
-            if corners[0][0][i][0] < min_x:
-                min_x = corners[0][0][i][0]
-            if corners[0][0][i][0] > max_x:
-                max_x = corners[0][0][i][0]
+        # loop through if there are multiple markers
 
-        # find the center of the image
-        centerObject = (min_x + max_x) / 2
+        for x in range(len(ids)):
+            # find the mix right side and min left side
+            min_x = 100000
+            max_x = 0
+            for i in range(len(corners[0][0])):
+                if corners[x][0][i][0] < min_x:
+                    min_x = corners[0][0][i][0]
+                if corners[x][0][i][0] > max_x:
+                    max_x = corners[0][0][i][0]
 
-        # find the angle 
-        # feild of view divided by two multiplied by the ratio:
-        # (center of the image - center of the screen) / (center of the screen - right side of the screen)
-        angle = (FOV / 2) * ( (abs(centerObject - center[0])) / (abs(center[0] - size[0])) )
-        return angle
+            # find the center of the image
+            centerObject = (min_x + max_x) / 2
+
+            # find the angle 
+            # feild of view divided by two multiplied by the ratio:
+            # (center of the image - center of the screen) / (center of the screen - right side of the screen)
+            angle = (FOV / 2) * ( (abs(centerObject - center[0])) / (abs(center[0] - size[0])) )
+            print("marker", str(x), angle)
         
         
     else:
@@ -61,6 +64,6 @@ def get_marker_location(name):
 # in this function, you should detect the aruco marker
 # and return the id of the marker
 if __name__ == "__main__":
-    print(get_marker_location("1"))
+    get_marker_location("two.jpg")
 
     
