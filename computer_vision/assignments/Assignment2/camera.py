@@ -3,6 +3,8 @@ import time
 import cv2
 import numpy
 
+
+# define the class for the camera
 class arducam:
     '''
     About Camera: https://www.raspberrypi.com/documentation/accessories/camera.html
