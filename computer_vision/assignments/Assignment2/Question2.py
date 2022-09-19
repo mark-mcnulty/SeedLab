@@ -7,10 +7,12 @@ def resize_image(name):
     orig = cv2.imread(name)
 
     h, w, c = orig.shape
+    print(h, w)
 
     # resize the image
     img = cv2.resize(orig, (0,0), fx=0.5, fy=0.5)
     h, w, c = img.shape
+    print(h,w)
     
     # save the image
     cv2.imwrite("newSize"+name, img)

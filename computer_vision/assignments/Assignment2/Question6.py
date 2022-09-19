@@ -21,11 +21,6 @@ def get_marker_location(name):
     size = (w, h)
     center = (w/2, h/2)
 
-    print(f"width: {w}")
-    print(f"height: {h}")
-    print(f"center: {w/2}, {h/2}")
-    print(f"center: {center[0]}")
-
     # check if grey scale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -35,7 +30,7 @@ def get_marker_location(name):
     corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
 
     # check if markers were found
-    if ids != None:
+    if ids is not None:
         # find the mix right side and min left side
         min_x = 100000
         max_x = 0
@@ -66,6 +61,6 @@ def get_marker_location(name):
 # in this function, you should detect the aruco marker
 # and return the id of the marker
 if __name__ == "__main__":
-    print(get_marker_location("6"))
+    print(get_marker_location("1"))
 
     

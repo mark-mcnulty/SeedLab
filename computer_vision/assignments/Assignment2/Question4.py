@@ -60,17 +60,26 @@ def detect_markers(name):
     if ids is not None:
         img = cv2.aruco.drawDetectedMarkers(img, corners, ids)
     else:
-        print(f"No markers found in image {name}")
+        print("No markers found in image: " + name)
 
     # save the image
     cv2.imwrite("new"+name, img)
 
 if __name__ == "__main__":
     num = 6
+    # convert to grey scale 
     for i in range(1, num+1):
-        convert_to_grayscale(f"{i}.jpg")
+        convert_to_grayscale(str(i) + ".jpg")
     
+    # detec the markers 
     for i in range(1, num+1):
-        detect_markers(f"{i}.jpg")
+        detect_markers(str(i) + ".jpg")
+        
+    # display all the photos
+    for i in range(1, num+1):
+        img = cv2.imread("new"+str(i)+".jpg")
+        cv2.imshow("image", img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
 
