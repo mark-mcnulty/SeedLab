@@ -107,8 +107,10 @@ if __name__ == "__main__":
     cam.setup()
 
     # capture an image
-    cam.camera.capture_sequence(['image%02d.jpg' % i for i in range(10)])
+    cam.capture("image.jpg")
 
+    cam.display("image.jpg")
+    
     # close the camera
     cam.close()
 
