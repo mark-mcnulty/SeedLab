@@ -27,7 +27,7 @@ class arducam:
 
     # make a setup function
     def setup(self):
-        self.camera.iso = 100
+        self.camera.iso = 150
         time.sleep(2)
 
         self.camera.shutter_speed = self.camera.exposure_speed
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     cam.capture("image.jpg")
 
     cam.display("image.jpg")
-    
+
     # close the camera
     cam.close()
 
