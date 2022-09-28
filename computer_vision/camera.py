@@ -27,7 +27,7 @@ class arducam:
 
     # make a setup function
     def setup(self):
-        self.camera.iso = 150
+        self.camera.iso = 500
         time.sleep(2)
 
         self.camera.shutter_speed = self.camera.exposure_speed
@@ -41,8 +41,10 @@ class arducam:
         if name[-4:] != ".jpg":
             name = name + ".jpg"
 
+        # display the image
         img = cv2.imread(name)
         cv2.imshow("image", img)
+        cv2.waitKey(0)
 
     # define a function to resize the image
     # the resized image should be half the original size
