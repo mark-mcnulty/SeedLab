@@ -27,7 +27,7 @@ class arducam:
 
     # make a setup function
     def setup(self):
-        self.camera.iso = 200
+        self.camera.iso = 300
         time.sleep(2)
 
         self.camera.shutter_speed = self.camera.exposure_speed
