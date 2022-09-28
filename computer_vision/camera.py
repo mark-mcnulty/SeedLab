@@ -25,6 +25,17 @@ class arducam:
     def close(self):
         self.camera.close()
 
+    # make a setup function
+    def setup(self):
+        self.camera.iso = 100
+        time.sleep(2)
+
+        self.camera.shutter_speed = self.camera.exposure_speed
+        self.camera.exposure_mode = 'off'
+        g = self.camera.awb_gains
+        self.camera.awb_mode = 'off'
+        self.camera.awb_gains = g
+
     # define a function to display the image
     def display(self, name="image.jpg"):
         if name[-4:] != ".jpg":
@@ -89,4 +100,6 @@ class arducam:
 
 
 if __name__ == "__main__":
-    print("main")
+    # make the object
+    cam = arducam()
+    
