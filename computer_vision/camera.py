@@ -102,4 +102,13 @@ class arducam:
 if __name__ == "__main__":
     # make the object
     cam = arducam()
-    
+
+    # setup the camera
+    cam.setup()
+
+    # capture an image
+    cam.camera.capture_sequence(['image%02d.jpg' % i for i in range(10)])
+
+    # close the camera
+    cam.close()
+
