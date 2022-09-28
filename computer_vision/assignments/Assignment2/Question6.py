@@ -45,6 +45,7 @@ def get_marker_location(name):
 
             # find the center of the image
             centerObject = (min_x + max_x) / 2
+            print(centerObject)
 
             # find the angle 
             # feild of view divided by two multiplied by the ratio:
