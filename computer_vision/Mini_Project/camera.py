@@ -30,10 +30,13 @@ class arducam:
         self.camera.iso = 300
         time.sleep(2)
 
-        self.camera.shutter_speed = self.camera.exposure_speed
         self.camera.exposure_mode = 'off'
+        self.camera.awb_mode = 'off'
+        # self.camera.drc_strength = 'off'
+
+        self.camera.shutter_speed = self.camera.exposure_speed
+        # self.camera.exposure_mode = 'off'
         g = self.camera.awb_gains
-        print(g)
         self.camera.awb_mode = 'off'
         self.camera.awb_gains = g
 
@@ -107,12 +110,15 @@ if __name__ == "__main__":
     cam = arducam()
 
     # setup the camera
-    cam.setup()
+    # cam.setup()
 
     # capture an image
-    cam.capture("image.jpg")
+    for i in range(10):
+        cam.capture("image.jpg")
 
-    cam.display("image.jpg")
+        cam.display("image.jpg")
+
+        print(cam.camera.awb_gains)
 
     # close the camera
     cam.close()
