@@ -40,7 +40,9 @@ class arducam:
         for i in range(N):
             self.capture()
             g = self.camera.awb_gains
-            print(str(g(0)) + " " + str(g(1)))
+            
+            print(type(g))
+            print(len(g))
 
         # self.camera.awb_mode = 'off'
         # self.camera.awb_gains = g
