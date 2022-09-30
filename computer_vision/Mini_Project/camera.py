@@ -27,18 +27,23 @@ class arducam:
 
     # make a setup function
     def setup(self):
-        self.camera.iso = 300
-        time.sleep(2)
+        N = 10
+        # self.camera.iso = 300
+        # time.sleep(2)
 
-        self.camera.exposure_mode = 'off'
-        self.camera.awb_mode = 'off'
+        # self.camera.exposure_mode = 'off'
+        # self.camera.awb_mode = 'off'
         # self.camera.drc_strength = 'off'
 
-        self.camera.shutter_speed = self.camera.exposure_speed
+        # self.camera.shutter_speed = self.camera.exposure_speed
         # self.camera.exposure_mode = 'off'
-        g = self.camera.awb_gains
-        self.camera.awb_mode = 'off'
-        self.camera.awb_gains = g
+        for i in range(N):
+            self.capture()
+            g = self.camera.awb_gains
+            print(g)
+
+        # self.camera.awb_mode = 'off'
+        # self.camera.awb_gains = g
 
     # define a function to display the image
     def display(self, name="image.jpg"):
@@ -110,18 +115,8 @@ if __name__ == "__main__":
     cam = arducam()
 
     # setup the camera
-    # cam.setup()
+    cam.setup()
 
-    N = 10
-
-    # capture an image
-    for i in range(N):
-        cam.capture("image.jpg")
-
-        cam.display("image.jpg")
-
-        print(cam.camera.awb_gains)
-        print(type(cam.camera.awb_gains))
 
     # close the camera
     cam.close()
