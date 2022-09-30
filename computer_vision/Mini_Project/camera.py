@@ -27,7 +27,6 @@ class arducam:
 
     # make a setup function
     def setup(self):
-        N = 10
         # self.camera.iso = 300
         # time.sleep(2)
 
@@ -37,13 +36,24 @@ class arducam:
 
         # self.camera.shutter_speed = self.camera.exposure_speed
         # self.camera.exposure_mode = 'off'
+        N = 10
+        red = 0
+        blue = 0
         for i in range(N):
             self.capture()
             g = self.camera.awb_gains
+            red += g[0]
+            blue += g[1]
 
             print(type(g))
             print(len(g))
             print(g[0])
+
+        red_avg = red/N
+        blue_avg = blue/N
+
+        print("red: ", red_avg)
+        print("blue: ", blue_avg)
 
         # self.camera.awb_mode = 'off'
         # self.camera.awb_gains = g
