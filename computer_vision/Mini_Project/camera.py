@@ -112,13 +112,16 @@ if __name__ == "__main__":
     # setup the camera
     # cam.setup()
 
+    N = 10
+
     # capture an image
-    for i in range(10):
+    for i in range(N):
         cam.capture("image.jpg")
 
         cam.display("image.jpg")
 
         print(cam.camera.awb_gains)
+        print(type(cam.camera.awb_gains))
 
     # close the camera
     cam.close()
