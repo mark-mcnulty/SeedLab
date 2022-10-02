@@ -1,11 +1,18 @@
 
+// all the include libraries
 #include "DualMC33926MotorShield.h"
+#include <Wire.h>
+
+
+// define the pins
 #define CLK_L_PIN 2
 #define CLK_R_PIN 3
 #define DT_L_PIN 7
 #define DT_R_PIN 8
 
+// define constants
 #define COUNTS_PER_ROTATION 128
+#define SLAVE_ADDRESS 0x04
 
 DualMC33926MotorShield md;
 
@@ -30,12 +37,31 @@ float r = 7.6;
 int count = 0;
 
 void setup() {
+  /*
+  * simulation and control
+  */
   Serial.begin(115200) ;
   attachInterrupt(digitalPinToInterrupt(CLK_L_PIN), CLK_L_ISR, CHANGE);  // change rising or falling
   attachInterrupt(digitalPinToInterrupt(CLK_R_PIN), CLK_R_ISR, CHANGE);  // pin, function, flag to look for
   Serial.println("Dual MC33926 Motor Shield");
   DualMC33926MotorShield() ;
   md.init();
+
+  /*
+  *
+  * Here is where the void setup for the system integration stuff is
+  * 
+  */
+ // the output pin to the raspberry pi
+  pinMode(13, OUTPUT);
+  // initialize i2c as slave
+  Wire.begin(SLAVE_ADDRESS);
+
+  // define callbacks for i2c communication
+  Wire.onReceive(receiveData);
+  Wire.onRequest(sendData);
+
+  Serial.println("Ready!");
 }
 
 
@@ -122,4 +148,43 @@ void CLK_R_ISR() {
       }
     }
   }
+}
+
+/*
+ here is where all the system integration functions will go
+
+*/
+// callback for received data
+void receiveData(int byteCount){
+  int i = 0 ;
+  while(Wire.available()) {
+    data[i] = Wire.read();
+    Serial.print(data[i]) ;
+    Serial.print(" ") ;
+    i++ ;
+
+    
+    
+  }
+  i-- ;
+  Serial.println(" ") ;
+}
+
+// callback for sending data
+void sendData(){
+  if (data[1] != 0) {
+    if(data[0] == 0) {
+      number = data[1] + 5 ;
+      Wire.write(number) ;
+    }
+    else if (data[0] == 1) {
+      number1 = data[1] + 10 ;
+      Wire.write(number1) ;
+    }
+  }
+  else {
+    Wire.write(data[0] + 5) ;
+  }
+  number = number + 5 ;
+  Wire.write(number);
 }
