@@ -2,7 +2,6 @@ import picamera
 import time
 import cv2
 import numpy
-import keyboard
 
 
 # define the class for the camera
@@ -275,10 +274,6 @@ if __name__ == "__main__":
 
         # print the quadrant
         print(quadrant)
-
-        # check if the user wants to quit
-        if keyboard.is_pressed('q'):
-            break
 
 
 
