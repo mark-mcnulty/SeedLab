@@ -89,19 +89,19 @@ void loop() {
     // new data shit
   }
 
-  if (state == 1) {
+  if (number == 1) {
     // PI controller to 0pi
   }
 
-  if (state == 2) {
+  if (number == 2) {
     // PI controller to pi/2
   }
 
-  if (state == 3) {
+  if (number == 3) {
     // PI controller to pi
   }
 
-  if (state == 4) {
+  if (number == 4) {
     // PI controller to 3pi/2
   }
 
