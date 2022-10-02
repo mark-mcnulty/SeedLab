@@ -19,7 +19,7 @@ DualMC33926MotorShield md;
 volatile int Direction = 0;
 
 float left = 0.0;
-float desiredLeft;
+float desiredTheta;
 float left_AV = 0.0;
 float leftVelocity = 0.0;
 
@@ -75,6 +75,12 @@ void setup() {
 
 void loop() {
 
+  float Kp, Ki, Ke;
+  float I = 0.00;
+  float e_past = 0.00;
+  float Ts = 0.00;
+  float Tc; // need current time
+
   if (flag_new_data) {
     // new data shit
   }
@@ -97,9 +103,8 @@ void loop() {
 
   // use millis
 }
-/*
-* This is where the simulation and control functions will go
-*/
+
+
 void CLK_L_ISR() {
   // assign the time
   dif_time_L = micros() - TIME;
@@ -108,7 +113,7 @@ void CLK_L_ISR() {
   // find the angular position of the encoder
   if (dif_time_L > 10000) {
     if (digitalRead(DT_L_PIN) == digitalRead(CLK_L_PIN)) {
-      right += (2 * (2 * PI)) / COUNTS_PER_ROTATION; // In radians
+      left += (2 * (2 * PI)) / COUNTS_PER_ROTATION; // In radians
 
       left_AV = (2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
       leftVelocity = left_AV * r;
@@ -118,7 +123,7 @@ void CLK_L_ISR() {
         TIME = micros();
       }
     } else if (digitalRead(DT_L_PIN) != digitalRead(CLK_L_PIN)) {
-      right -= (2 * (2 * PI)) / COUNTS_PER_ROTATION;
+      left -= (2 * (2 * PI)) / COUNTS_PER_ROTATION;
 
       left_AV = (-2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
       leftVelocity = left_AV * r;
