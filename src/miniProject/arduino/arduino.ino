@@ -9,13 +9,9 @@
 #define CLK_R_PIN 3
 #define DT_L_PIN 7
 #define DT_R_PIN 8
-#define D2 4
-#define SF 12
-#define ANALOG0 'A0'
-#define ANALOG1 'A1'
 
 // define constants
-#define COUNTS_PER_ROTATION 128
+#define COUNTS_PER_ROTATION 3200
 #define SLAVE_ADDRESS 0x04
 
 DualMC33926MotorShield md;
@@ -23,18 +19,26 @@ DualMC33926MotorShield md;
 volatile int Direction = 0;
 
 float left = 0.0;
+float desiredLeft;
 float left_AV = 0.0;
 float leftVelocity = 0.0;
 
 float right = 0.0;
+float desiredRight = 0.0;
 float right_AV = 0.0;
 float rightVelocity = 0.0;
+
 float TIME = 0.0;
 float dif_time_L = 0.0;
 
 const int wait = 138 ;
 const int pause = 2000 ;
 int state = 0 ;
+
+// this is for system integration
+int flag_new_data = 0;
+int state = 0;
+int data[32] = {0} ;
 
 
 //In centimeters Not converted
@@ -49,7 +53,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(CLK_L_PIN), CLK_L_ISR, CHANGE);  // change rising or falling
   attachInterrupt(digitalPinToInterrupt(CLK_R_PIN), CLK_R_ISR, CHANGE);  // pin, function, flag to look for
   Serial.println("Dual MC33926 Motor Shield");
-  DualMC33926MotorShield(DT_L_PIN,CLK_L_PIN,ANALOG0,DT_R_PIN,CLK_R_PIN,ANALOG1,D2,SF) ;
+  DualMC33926MotorShield() ;
   md.init();
 
   /*
@@ -95,9 +99,9 @@ void CLK_L_ISR() {
   // find the angular position of the encoder
   if (dif_time_L > 10000) {
     if (digitalRead(DT_L_PIN) == digitalRead(CLK_L_PIN)) {
-      right += (2 * (2 * PI)) / COUNTS_PER_ROTATION;
+      right += (2 * (2 * PI)) / COUNTS_PER_ROTATION; // In radians
 
-      left_AV = (-2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
+      left_AV = (2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
       leftVelocity = left_AV * r;
       rightVelocity = 0;
       if (leftVelocity <= 0) {
@@ -107,7 +111,7 @@ void CLK_L_ISR() {
     } else if (digitalRead(DT_L_PIN) != digitalRead(CLK_L_PIN)) {
       right -= (2 * (2 * PI)) / COUNTS_PER_ROTATION;
 
-      left_AV = (2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
+      left_AV = (-2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
       leftVelocity = left_AV * r;
       rightVelocity = 0;
       if (leftVelocity >= 0) {
@@ -165,9 +169,6 @@ void receiveData(int byteCount){
     Serial.print(data[i]) ;
     Serial.print(" ") ;
     i++ ;
-
-    
-    
   }
   i-- ;
   Serial.println(" ") ;
