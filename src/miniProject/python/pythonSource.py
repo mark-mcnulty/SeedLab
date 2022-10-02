@@ -1,6 +1,6 @@
-import smbus
 import time
 import camera
+import i2c
 
 # for RPI version 1, use “bus = smbus.SMBus(0)”
 bus = smbus.SMBus(1)
@@ -27,6 +27,9 @@ if __name__ == "__main__":
     # setup the camera
     cam.setup()
 
+    # setup the bus connection 
+    device = i2c.Device(address, 1)
+
     # continuously capture images
     while True:
         try:
@@ -42,7 +45,7 @@ if __name__ == "__main__":
             # if the quadrant is not none
             if quadrant != None:
                 # send the quadrant to the arduino
-                writeNumber(quadrant, 0)
+                device.write8(0, quadrant)
 
         except KeyboardInterrupt:
             print("Exiting")
