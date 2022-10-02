@@ -203,7 +203,7 @@ class arducam:
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         # detect the markers
-        aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_50)
+        aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_50)
         parameters =  cv2.aruco.DetectorParameters_create()
         corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
 
@@ -250,7 +250,6 @@ class arducam:
             return quadrant
 
         else:
-            print("No markers detected")
             return None
 
 
