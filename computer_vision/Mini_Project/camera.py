@@ -64,7 +64,7 @@ class arducam:
         # display the image
         img = cv2.imread(name)
         cv2.imshow("image", img)
-        time.sleep(5)
+        cv2.waitKey(1000)
         cv2.destroyAllWindows()
 
     # define a function to resize the image
