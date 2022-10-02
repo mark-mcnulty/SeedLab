@@ -18,6 +18,7 @@ DualMC33926MotorShield md;
 
 volatile int Direction = 0;
 
+int period = 10;
 float left = 0.0;
 float desiredTheta;
 float left_AV = 0.0;
@@ -109,6 +110,7 @@ void loop() {
   
   // if statement to zero encoder
   // use millis so it works
+  while (millis() < Tc + period);
 }
 
 
