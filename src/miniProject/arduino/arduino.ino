@@ -34,6 +34,7 @@ float dif_time_L = 0.0;
 
 const int wait = 138 ;
 const int pause = 2000 ;
+int state = 0 ;
 
 
 //In centimeters Not converted
@@ -79,12 +80,7 @@ void loop() {
     Serial.print("\t");
     Serial.println(right);
     Direction = 0;
-    for (int i = 0; i < 4; i++) {
-        md.setM1Speed(400) ;
-        delay(wait) ;
-        md.setM1Speed(0) ;
-        delay(pause) ;
-    }
+    
   }
   delay(100);
 }
@@ -162,6 +158,7 @@ void CLK_R_ISR() {
 */
 // callback for received data
 void receiveData(int byteCount){
+  state = Wire.read() ;
   int i = 0 ;
   while(Wire.available()) {
     data[i] = Wire.read();
