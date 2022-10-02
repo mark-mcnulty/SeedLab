@@ -95,9 +95,9 @@ void CLK_L_ISR() {
   // find the angular position of the encoder
   if (dif_time_L > 10000) {
     if (digitalRead(DT_L_PIN) == digitalRead(CLK_L_PIN)) {
-      right += (2 * (2 * PI)) / COUNTS_PER_ROTATION;
+      right += (2 * (2 * PI)) / COUNTS_PER_ROTATION; // In radians
 
-      left_AV = (-2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
+      left_AV = (2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
       leftVelocity = left_AV * r;
       rightVelocity = 0;
       if (leftVelocity <= 0) {
@@ -107,7 +107,7 @@ void CLK_L_ISR() {
     } else if (digitalRead(DT_L_PIN) != digitalRead(CLK_L_PIN)) {
       right -= (2 * (2 * PI)) / COUNTS_PER_ROTATION;
 
-      left_AV = (2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
+      left_AV = (-2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
       leftVelocity = left_AV * r;
       rightVelocity = 0;
       if (leftVelocity >= 0) {
