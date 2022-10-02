@@ -1,10 +1,10 @@
 
 #include "DualMC33926MotorShield.h"
 #include <Encoder.h>
-#define CLK_L_PIN 3
-#define CLK_R_PIN 2
-#define DT_L_PIN 6
-#define DT_R_PIN 7
+//#define CLK_L_PIN 3
+//#define CLK_R_PIN 2
+//#define DT_L_PIN 6
+//#define DT_R_PIN 7
 
 #define COUNTS_PER_ROTATION 128
 
@@ -19,7 +19,6 @@ float leftVelocity = 0.0;
 float right = 0.0;
 float right_AV = 0.0;
 float rightVelocity = 0.0;
-
 float TIME = 0.0;
 float dif_time_L = 0.0;
 
@@ -45,11 +44,11 @@ void loop() {
   if (Direction == 1 && abs(leftVelocity) < 2 && abs(rightVelocity) < 2) {
     //Serial.print(count);
     //Serial.print("\t");
-    Serial.print(TIME / 1000);
+    Serial.print(TIME / 1000000);
     Serial.print("\t");
-    Serial.print(leftVelocity);
+    Serial.print(left);
     Serial.print("\t");
-    Serial.println(rightVelocity);
+    Serial.println(right;
     Direction = 0;
     for (int i = 0; i < 4; i++) {
         md.setM1Speed(400) ;
@@ -66,11 +65,11 @@ void CLK_L_ISR() {
   // assign the time
 
   // find the angular position of the encoder
-  if (dif_time_L > 0.001) {
+  if (dif_time_L > 10000) {
     if (digitalRead(DT_L_PIN) == digitalRead(CLK_L_PIN)) {
-      //right += (2 * (2 * PI)) / COUNTS_PER_ROTATION;
+      right += (2 * (2 * PI)) / COUNTS_PER_ROTATION;
 
-      left_AV = (-2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000));
+      left_AV = (-2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
       leftVelocity = left_AV * r;
       rightVelocity = 0;
       if (leftVelocity <= 0) {
@@ -78,9 +77,9 @@ void CLK_L_ISR() {
         TIME = micros();
       }
     } else if (digitalRead(DT_L_PIN) != digitalRead(CLK_L_PIN)) {
-      // right -= (2 * (2 * PI)) / COUNTS_PER_ROTATION;
+      right -= (2 * (2 * PI)) / COUNTS_PER_ROTATION;
 
-      left_AV = (2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000));
+      left_AV = (2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
       leftVelocity = left_AV * r;
       rightVelocity = 0;
       if (leftVelocity >= 0) {
@@ -100,11 +99,11 @@ void CLK_R_ISR() {
   // assign the time
 
   // find the angular position of the encoder
-  if (dif_time_L > 0.001) {
+  if (dif_time_L > 10000) {
     if (digitalRead(DT_R_PIN) == digitalRead(CLK_R_PIN)) {
-      //right += (2 * (2 * PI)) / COUNTS_PER_ROTATION;
+      right += (2 * (2 * PI)) / COUNTS_PER_ROTATION;
 
-      right_AV = (-2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000));
+      right_AV = (-2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
       rightVelocity = right_AV * r;
       leftVelocity = 0;
       if (rightVelocity <= 0) {
@@ -112,9 +111,9 @@ void CLK_R_ISR() {
         TIME = micros();
       }
     } else if (digitalRead(DT_R_PIN) != digitalRead(CLK_R_PIN)) {
-      // right -= (2 * (2 * PI)) / COUNTS_PER_ROTATION;
+      right -= (2 * (2 * PI)) / COUNTS_PER_ROTATION;
 
-      right_AV = (2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000));
+      right_AV = (2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
       rightVelocity = right_AV * r;
       leftVelocity = 0;
       if (rightVelocity >= 0) {
