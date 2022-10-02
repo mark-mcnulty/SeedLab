@@ -19,7 +19,7 @@ DualMC33926MotorShield md;
 volatile int Direction = 0;
 
 float left = 0.0;
-float desiredLeft;
+float desiredTheta;
 float left_AV = 0.0;
 float leftVelocity = 0.0;
 
@@ -32,11 +32,15 @@ float TIME = 0.0;
 float dif_time_L = 0.0;
 
 const int wait = 138 ;
+<<<<<<< HEAD
 const int pause = 2000;
 
 //for sendData void
 int number;
 int number1;
+=======
+const int pause = 2000 ;
+>>>>>>> 248a87715f2fd4201342c94890fac70fb9ab2f47
 
 // this is for system integration
 int flag_new_data = 0;
@@ -77,22 +81,37 @@ void setup() {
 
 
 void loop() {
-  if (Direction == 1 && abs(leftVelocity) < 2 && abs(rightVelocity) < 2) {
-    //Serial.print(count);
-    //Serial.print("\t");
-    Serial.print(TIME / 1000000);
-    Serial.print("\t");
-    Serial.print(left);
-    Serial.print("\t");
-    Serial.println(right);
-    Direction = 0;
-    
+
+  float Kp, Ki, Ke;
+  float I = 0.00;
+  float e_past = 0.00;
+  float Ts = 0.00;
+  float Tc; // need current time
+
+  if (flag_new_data) {
+    // new data shit
   }
-  delay(100);
+
+  if (state == 1) {
+    // PI controller to 0pi
+  }
+
+  if (state == 2) {
+    // PI controller to pi/2
+  }
+
+  if (state == 3) {
+    // PI controller to pi
+  }
+
+  if (state == 4) {
+    // PI controller to 3pi/2
+  }
+
+  // use millis
 }
-/*
-* This is where the simulation and control functions will go
-*/
+
+
 void CLK_L_ISR() {
   // assign the time
   //TIME = millis();
@@ -102,7 +121,7 @@ void CLK_L_ISR() {
   // find the angular position of the encoder
   if (dif_time_L > 1) {
     if (digitalRead(DT_L_PIN) == digitalRead(CLK_L_PIN)) {
-      right += (2 * (2 * PI)) / COUNTS_PER_ROTATION; // In radians
+      left += (2 * (2 * PI)) / COUNTS_PER_ROTATION; // In radians
 
       left_AV = (2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((millis() - TIME) / 1000000));
       leftVelocity = left_AV * r;
@@ -112,7 +131,7 @@ void CLK_L_ISR() {
         TIME = millis();
       }
     } else if (digitalRead(DT_L_PIN) != digitalRead(CLK_L_PIN)) {
-      right -= (2 * (2 * PI)) / COUNTS_PER_ROTATION;
+      left -= (2 * (2 * PI)) / COUNTS_PER_ROTATION;
 
       left_AV = (-2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((millis() - TIME) / 1000000));
       leftVelocity = left_AV * r;
