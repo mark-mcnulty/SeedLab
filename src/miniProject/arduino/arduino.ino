@@ -42,8 +42,8 @@ void setup() {
   Wire.begin(SLAVE_ADDRESS);
 
   // define callbacks for i2c communication
-  //Wire.onReceive(receiveData);
-  //Wire.onRequest(sendData);
+  Wire.onReceive(receiveData);
+  Wire.onRequest(sendData);
 
   Serial.println("Ready!");
   motorLeft.write(0) ;  
@@ -110,4 +110,30 @@ void loop() {
   
   // if statement to zero encoder
   // use millis so it works
+}
+
+
+
+
+/*
+ here is where all the system integration functions will go
+
+*/
+// callback for received data from the raspberry pi
+void receiveData(int byteCount){
+  int i = 0 ;
+  while(Wire.available()) {
+    data[i] = Wire.read();
+    if (i == 1){
+      number = data[1];
+    }
+    i++ ;  
+  }
+  Serial.println(" ") ;
+}
+
+
+// callback for sending data to the raspberry pi
+void sendData(){
+    Wire.write(number);
 }
