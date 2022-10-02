@@ -4,6 +4,7 @@ import time
 bus = smbus.SMBus(1)
 
 # This is the address we setup in the Arduino Program
+# this is the slave address
 address = 0x04
 
 def writeNumber(value,offset):
