@@ -32,8 +32,11 @@ float TIME = 0.0;
 float dif_time_L = 0.0;
 
 const int wait = 138 ;
-const int pause = 2000 ;
-int state = 0 ;
+const int pause = 2000;
+
+//for sendData void
+int number;
+int number1;
 
 // this is for system integration
 int flag_new_data = 0;
@@ -55,7 +58,6 @@ void setup() {
   Serial.println("Dual MC33926 Motor Shield");
   DualMC33926MotorShield() ;
   md.init();
-
   /*
   *
   * Here is where the void setup for the system integration stuff is
@@ -93,30 +95,31 @@ void loop() {
 */
 void CLK_L_ISR() {
   // assign the time
-  dif_time_L = micros() - TIME;
+  //TIME = millis();
+  dif_time_L = millis() - TIME;
   // assign the time
 
   // find the angular position of the encoder
-  if (dif_time_L > 10000) {
+  if (dif_time_L > 1) {
     if (digitalRead(DT_L_PIN) == digitalRead(CLK_L_PIN)) {
       right += (2 * (2 * PI)) / COUNTS_PER_ROTATION; // In radians
 
-      left_AV = (2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
+      left_AV = (2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((millis() - TIME) / 1000000));
       leftVelocity = left_AV * r;
       rightVelocity = 0;
       if (leftVelocity <= 0) {
         Direction = 1;
-        TIME = micros();
+        TIME = millis();
       }
     } else if (digitalRead(DT_L_PIN) != digitalRead(CLK_L_PIN)) {
       right -= (2 * (2 * PI)) / COUNTS_PER_ROTATION;
 
-      left_AV = (-2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
+      left_AV = (-2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((millis() - TIME) / 1000000));
       leftVelocity = left_AV * r;
       rightVelocity = 0;
       if (leftVelocity >= 0) {
         Direction = 1;
-        TIME = micros();
+        TIME = millis();
       }
     }
 
@@ -127,7 +130,7 @@ void CLK_L_ISR() {
 
 void CLK_R_ISR() {
   // assign the time
-  dif_time_L = micros() - TIME;
+  dif_time_L = millis() - TIME;
   // assign the time
 
   // find the angular position of the encoder
@@ -135,22 +138,22 @@ void CLK_R_ISR() {
     if (digitalRead(DT_R_PIN) == digitalRead(CLK_R_PIN)) {
       right += (2 * (2 * PI)) / COUNTS_PER_ROTATION;
 
-      right_AV = (-2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
+      right_AV = (-2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((millis() - TIME) / 1000000));
       rightVelocity = right_AV * r;
       leftVelocity = 0;
       if (rightVelocity <= 0) {
         Direction = 1;
-        TIME = micros();
+        TIME = millis();
       }
     } else if (digitalRead(DT_R_PIN) != digitalRead(CLK_R_PIN)) {
       right -= (2 * (2 * PI)) / COUNTS_PER_ROTATION;
 
-      right_AV = (2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
+      right_AV = (2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((millis() - TIME) / 1000000));
       rightVelocity = right_AV * r;
       leftVelocity = 0;
       if (rightVelocity >= 0) {
         Direction = 1;
-        TIME = micros();
+        TIME = millis();
       }
     }
   }
