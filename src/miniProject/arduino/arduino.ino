@@ -32,15 +32,12 @@ float TIME = 0.0;
 float dif_time_L = 0.0;
 
 const int wait = 138 ;
-<<<<<<< HEAD
 const int pause = 2000;
 
 //for sendData void
-int number;
+int number = 0;
 int number1;
-=======
 const int pause = 2000 ;
->>>>>>> 248a87715f2fd4201342c94890fac70fb9ab2f47
 
 // this is for system integration
 int flag_new_data = 0;
@@ -182,35 +179,21 @@ void CLK_R_ISR() {
  here is where all the system integration functions will go
 
 */
-// callback for received data
+// callback for received data from the raspberry pi
 void receiveData(int byteCount){
-  state = Wire.read() ;
   int i = 0 ;
   while(Wire.available()) {
     data[i] = Wire.read();
-    Serial.print(data[i]) ;
-    Serial.print(" ") ;
-    i++ ;
+    if (i == 1){
+      number = data[1];
+    }
+    i++ ;  
   }
-  i-- ;
   Serial.println(" ") ;
 }
 
-// callback for sending data
+
+// callback for sending data to the raspberry pi
 void sendData(){
-  if (data[1] != 0) {
-    if(data[0] == 0) {
-      number = data[1] + 5 ;
-      Wire.write(number) ;
-    }
-    else if (data[0] == 1) {
-      number1 = data[1] + 10 ;
-      Wire.write(number1) ;
-    }
-  }
-  else {
-    Wire.write(data[0] + 5) ;
-  }
-  number = number + 5 ;
-  Wire.write(number);
+    Wire.write(number);
 }

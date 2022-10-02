@@ -19,6 +19,13 @@ void setup() {
 
 void loop() {
   delay(100);
+  if (number == 1){
+    Serial.println(number);
+  } else if (number == 2){
+    Serial.println(number);
+  } else{
+    Serial.println("nope");
+  }
 }
 
 // callback for received data from the raspberry pi
@@ -26,8 +33,9 @@ void receiveData(int byteCount){
   int i = 0 ;
   while(Wire.available()) {
     data[i] = Wire.read();
-    Serial.print(data[i]) ;
-    Serial.print(" ") ;
+    if (i == 1){
+      number = data[1];
+    }
     i++ ;  
   }
   Serial.println(" ") ;
