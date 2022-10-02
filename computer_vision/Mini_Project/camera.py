@@ -273,6 +273,9 @@ if __name__ == "__main__":
             print("Exiting")
             break
 
+        # just for fun
+        print()
+
 
 
     # close the camera
