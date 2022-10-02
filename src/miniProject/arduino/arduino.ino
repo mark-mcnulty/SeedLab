@@ -35,7 +35,7 @@ const int wait = 138 ;
 const int pause = 2000 ;
 
 // this is for system integration
-int state = 0;
+int number = 0;
 int data[32] = {0} ;
 
 
