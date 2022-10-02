@@ -45,15 +45,9 @@ class arducam:
             red += g[0]
             blue += g[1]
 
-            print(type(g))
-            print(len(g))
-            print(g[0])
-
         red_avg = red/N
         blue_avg = blue/N
         total_gains = (red_avg, blue_avg)
-        print()
-        print(total_gains)
 
         print("red: ", red_avg)
         print("blue: ", blue_avg)
@@ -263,17 +257,21 @@ if __name__ == "__main__":
 
     # continuously capture images
     while True:
-        # capture the image
-        cam.capture()
+        try:
+            # capture the image
+            cam.capture()
 
-        # display the image
-        cam.display()
+            # display the image
+            cam.display()
 
-        # detect the quadrant
-        quadrant = cam.detect_quadrant()
+            # detect the quadrant
+            quadrant = cam.detect_quadrant()
 
-        # print the quadrant
-        print(quadrant)
+            # print the quadrant
+            print(quadrant)
+        except KeyboardInterrupt:
+            print("Exiting")
+            break
 
 
 
