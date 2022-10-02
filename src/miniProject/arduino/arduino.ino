@@ -19,6 +19,26 @@ DualMC33926MotorShield md;
 Encoder motorLeft(7,2) ;
 
 
+int period = 10;
+float left = 0.0;
+float desiredTheta;
+float left_AV = 0.0;
+float leftVelocity = 0.0;
+
+float right = 0.0;
+float desiredRight = 0.0;
+float right_AV = 0.0;
+float rightVelocity = 0.0;
+
+float TIME = 0.0;
+float dif_time_L = 0.0;
+
+const int wait = 138 ;
+const int pause = 2000 ;
+
+// this is for system integration
+int number = 0;
+int data[32] = {0} ;
 
 
 //In centimeters Not converted
@@ -110,6 +130,7 @@ void loop() {
   
   // if statement to zero encoder
   // use millis so it works
+  while (millis() < Tc + period);
 }
 
 
