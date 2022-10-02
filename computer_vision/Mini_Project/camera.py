@@ -2,6 +2,7 @@ import picamera
 import time
 import cv2
 import numpy
+import keyboard
 
 
 # define the class for the camera
@@ -70,7 +71,8 @@ class arducam:
         # display the image
         img = cv2.imread(name)
         cv2.imshow("image", img)
-        cv2.waitKey(0)
+        time.sleep(1)
+        cv2.destroyAllWindows()
 
     # define a function to resize the image
     # the resized image should be half the original size
@@ -265,18 +267,19 @@ if __name__ == "__main__":
         # capture the image
         cam.capture()
 
+        # display the image
+        cam.display()
+
         # detect the quadrant
         quadrant = cam.detect_quadrant()
 
         # print the quadrant
         print(quadrant)
 
-        # wait for a key press
-        cv2.waitKey(0)
-
         # check if the user wants to quit
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if keyboard.is_pressed('q'):
             break
+
 
 
     # close the camera
