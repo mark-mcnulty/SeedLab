@@ -126,6 +126,133 @@ class arducam:
         #                        corners[0][0][1][0] -> 2nd corner of the id marker 0
         return ids, corners
 
+    def get_marker_location(name="image.jpg"):
+        FOV = 53.50
+        # check that the name has the correct extension
+        if name[-4:] != ".jpg":
+            name = name + ".jpg"
+
+        # read the image
+        img = cv2.imread(name)
+
+        # get the size of the image
+        h, w, c = img.shape
+        size = (w, h)
+        center = (w/2, h/2)
+
+        # check if grey scale
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        # detect the markers
+        aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_50)
+        parameters =  cv2.aruco.DetectorParameters_create()
+        corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
+
+        # check if markers were found
+        if ids is not None:
+            # loop through if there are multiple markers
+
+            for x in range(len(ids)):
+                # find the mix right side and min left side
+                min_x = 100000
+                max_x = 0
+                for i in range(len(corners[0][0])):
+                    if corners[x][0][i][0] < min_x:
+                        min_x = corners[0][0][i][0]
+                    if corners[x][0][i][0] > max_x:
+                        max_x = corners[0][0][i][0]
+
+                # find the center of the image
+                centerObject = (min_x + max_x) / 2
+                print(centerObject)
+
+                # find the angle 
+                # feild of view divided by two multiplied by the ratio:
+                # (center of the image - center of the screen) / (center of the screen - right side of the screen)
+                angle = (FOV / 2) * ( (abs(centerObject - center[0])) / (abs(center[0] - size[0])) )
+                print("marker", str(x), angle)
+            
+            
+        else:
+            print("No markers detected")
+            return None
+    
+    # define a function that detects the quadrant the aruco marker
+    # is in the image
+    # the image should be split into 4 quadrants
+    # the function should return the quadrant number
+    # 1 | 0
+    # 2 | 3
+    def detect_quadrant(self, name="image.jpg"):
+        FOV_X = 53.50
+        FOV_Y = 41.41
+        quadrant = None
+        # check that the name has the correct extension
+        if name[-4:] != ".jpg":
+            name = name + ".jpg"
+
+        # read the image
+        img = cv2.imread(name)
+
+        # get the size of the image
+        h, w, c = img.shape
+        size = (w, h)
+        center = (w/2, h/2)
+
+        # check if grey scale
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        # detect the markers
+        aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_50)
+        parameters =  cv2.aruco.DetectorParameters_create()
+        corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
+
+        # check if markers were found
+        if ids is not None:
+            # loop through if there are multiple markers
+            for x in range(len(ids)):
+                # find the mix right side and min left side
+                min_x = 100000
+                max_x = 0
+
+                min_y = 100000
+                max_y = 0
+                for i in range(len(corners[0][0])):
+                    # detect max_x and min_x
+                    if corners[x][0][i][0] < min_x:
+                        min_x = corners[0][0][i][0]
+                    if corners[x][0][i][0] > max_x:
+                        max_x = corners[0][0][i][0]
+
+                    # detect max_y and min_y
+                    if corners[x][0][i][1] < min_y:
+                        min_y = corners[0][0][i][1]
+                    if corners[x][0][i][1] > max_y:
+                        max_y = corners[0][0][i][1]
+
+                # find the center of the image
+                centerObject_x = (min_x + max_x) / 2
+                centerObject_y = (min_y + max_y) / 2
+                
+                # find what quadrant the marker is in
+                # 1 | 0
+                # 2 | 3
+                if centerObject_x < center[0] and centerObject_y < center[1]:
+                    quadrant = 1
+                elif centerObject_x > center[0] and centerObject_y < center[1]:
+                    quadrant = 0
+                elif centerObject_x < center[0] and centerObject_y > center[1]:
+                    quadrant = 2
+                elif centerObject_x > center[0] and centerObject_y > center[1]:
+                    quadrant = 3
+
+            # return the quadrant
+            return quadrant
+
+        else:
+            print("No markers detected")
+            return None
+
 
 if __name__ == "__main__":
     # make the object
@@ -133,6 +260,24 @@ if __name__ == "__main__":
 
     # setup the camera
     cam.setup()
+
+    # continuously capture images
+    while True:
+        # capture the image
+        cam.capture()
+
+        # detect the quadrant
+        quadrant = cam.detect_quadrant()
+
+        # print the quadrant
+        print(quadrant)
+
+        # wait for a key press
+        cv2.waitKey(0)
+
+        # check if the user wants to quit
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
 
     # close the camera
