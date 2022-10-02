@@ -17,15 +17,16 @@ def readNumber():
     number = bus.read_byte_data(address,0, 32)
     return number
 
-while True:
-    var = int(input("Enter 1 – 9: "))
-    if not var:
-        continue
+if __name__ == "__main__":
+    while True:
+        var = int(input("Enter 1 – 9: "))
+        if not var:
+            continue
 
-    writeNumber(var, 0)
-    print ("RPI: Hi Arduino, I sent you ", var, " and offset ")
-    # sleep one second
-    time.sleep(1)
+        writeNumber(var, 0)
+        print ("RPI: Hi Arduino, I sent you ", var, " and offset ")
+        # sleep one second
+        time.sleep(1)
 
-    number = readNumber()
-    print ("Arduino: Hey RPI, I received a digit ", number)
+        number = readNumber()
+        print ("Arduino: Hey RPI, I received a digit ", number)
