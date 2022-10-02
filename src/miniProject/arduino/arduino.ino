@@ -9,6 +9,10 @@
 #define CLK_R_PIN 3
 #define DT_L_PIN 7
 #define DT_R_PIN 8
+#define D2 4
+#define SF 12
+#define ANALOG0 'A0'
+#define ANALOG1 'A1'
 
 // define constants
 #define COUNTS_PER_ROTATION 128
@@ -44,7 +48,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(CLK_L_PIN), CLK_L_ISR, CHANGE);  // change rising or falling
   attachInterrupt(digitalPinToInterrupt(CLK_R_PIN), CLK_R_ISR, CHANGE);  // pin, function, flag to look for
   Serial.println("Dual MC33926 Motor Shield");
-  DualMC33926MotorShield() ;
+  DualMC33926MotorShield(DT_L_PIN,CLK_L_PIN,ANALOG0,DT_R_PIN,CLK_R_PIN,ANALOG1,D2,SF) ;
   md.init();
 
   /*
@@ -95,9 +99,9 @@ void CLK_L_ISR() {
   // find the angular position of the encoder
   if (dif_time_L > 10000) {
     if (digitalRead(DT_L_PIN) == digitalRead(CLK_L_PIN)) {
-      right += (2 * (2 * PI)) / COUNTS_PER_ROTATION; // In radians
+      right += (2 * (2 * PI)) / COUNTS_PER_ROTATION;
 
-      left_AV = (2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
+      left_AV = (-2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
       leftVelocity = left_AV * r;
       rightVelocity = 0;
       if (leftVelocity <= 0) {
@@ -107,7 +111,7 @@ void CLK_L_ISR() {
     } else if (digitalRead(DT_L_PIN) != digitalRead(CLK_L_PIN)) {
       right -= (2 * (2 * PI)) / COUNTS_PER_ROTATION;
 
-      left_AV = (-2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
+      left_AV = (2 * (2 * PI)) / (COUNTS_PER_ROTATION * ((micros() - TIME) / 1000000));
       leftVelocity = left_AV * r;
       rightVelocity = 0;
       if (leftVelocity >= 0) {
