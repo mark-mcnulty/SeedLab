@@ -17,7 +17,6 @@ void setup()
  
 void loop()
 {
-  int i = 0 ;
   for (int i = 0; i < 4; i++) {
     md.setM1Speed(400) ;
     delay(wait) ;
