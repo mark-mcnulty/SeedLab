@@ -2,8 +2,6 @@
 
 #define SLAVE_ADDRESS 0x04
 int number = 0;
-int number1 = 0 ;
-int state = 0;
 int data[32] = {0} ;
 
 void setup() {
@@ -38,19 +36,5 @@ void receiveData(int byteCount){
 
 // callback for sending data to the raspberry pi
 void sendData(){
-  if (data[1] != 0) {
-    if(data[0] == 0) {
-      number = data[1] + 5 ;
-      Wire.write(number) ;
-    }
-    else if (data[0] == 1) {
-      number1 = data[1] + 10 ;
-      Wire.write(number1) ;
-    }
-  }
-  else {
-    Wire.write(data[0] + 5) ;
-  }
-  number = number + 5 ;
-  Wire.write(number);
+    Wire.write(number);
 }
