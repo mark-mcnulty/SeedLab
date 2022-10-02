@@ -51,12 +51,14 @@ class arducam:
 
         red_avg = red/N
         blue_avg = blue/N
+        total_gains = (red_avg, blue_avg)
 
         print("red: ", red_avg)
         print("blue: ", blue_avg)
 
-        # self.camera.awb_mode = 'off'
-        # self.camera.awb_gains = g
+
+        self.camera.awb_mode = 'off'
+        self.camera.awb_gains = total_gains
 
     # define a function to display the image
     def display(self, name="image.jpg"):
