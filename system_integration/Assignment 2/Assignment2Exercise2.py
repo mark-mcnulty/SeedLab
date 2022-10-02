@@ -26,3 +26,6 @@ while True:
     print ("RPI: Hi Arduino, I sent you ", var, " and offset ")
     # sleep one second
     time.sleep(1)
+
+    number = readNumber()
+    print ("Arduino: Hey RPI, I received a digit ", number)
