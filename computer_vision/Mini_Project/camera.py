@@ -182,8 +182,8 @@ class arducam:
     # is in the image
     # the image should be split into 4 quadrants
     # the function should return the quadrant number
-    # 1 | 0
-    # 2 | 3
+    # 2 | 1
+    # 3 | 4
     def detect_quadrant(self, name="image.jpg"):
         FOV_X = 53.50
         FOV_Y = 41.41
@@ -236,16 +236,16 @@ class arducam:
                 centerObject_y = (min_y + max_y) / 2
                 
                 # find what quadrant the marker is in
-                # 1 | 0
-                # 2 | 3
+                # 2 | 1
+                # 3 | 4
                 if centerObject_x < center[0] and centerObject_y < center[1]:
-                    quadrant = 1
-                elif centerObject_x > center[0] and centerObject_y < center[1]:
-                    quadrant = 0
-                elif centerObject_x < center[0] and centerObject_y > center[1]:
                     quadrant = 2
-                elif centerObject_x > center[0] and centerObject_y > center[1]:
+                elif centerObject_x > center[0] and centerObject_y < center[1]:
+                    quadrant = 1
+                elif centerObject_x < center[0] and centerObject_y > center[1]:
                     quadrant = 3
+                elif centerObject_x > center[0] and centerObject_y > center[1]:
+                    quadrant = 4
 
             # return the quadrant
             return quadrant
