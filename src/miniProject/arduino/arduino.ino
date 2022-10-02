@@ -33,7 +33,6 @@ float dif_time_L = 0.0;
 
 const int wait = 138 ;
 const int pause = 2000 ;
-int state = 0 ;
 
 // this is for system integration
 int flag_new_data = 0;
@@ -75,18 +74,28 @@ void setup() {
 
 
 void loop() {
-  if (Direction == 1 && abs(leftVelocity) < 2 && abs(rightVelocity) < 2) {
-    //Serial.print(count);
-    //Serial.print("\t");
-    Serial.print(TIME / 1000000);
-    Serial.print("\t");
-    Serial.print(left);
-    Serial.print("\t");
-    Serial.println(right);
-    Direction = 0;
-    
+
+  if (flag_new_data) {
+    // new data shit
   }
-  delay(100);
+
+  if (state == 1) {
+    // PI controller to 0pi
+  }
+
+  if (state == 2) {
+    // PI controller to pi/2
+  }
+
+  if (state == 3) {
+    // PI controller to pi
+  }
+
+  if (state == 4) {
+    // PI controller to 3pi/2
+  }
+
+  // use millis
 }
 /*
 * This is where the simulation and control functions will go
