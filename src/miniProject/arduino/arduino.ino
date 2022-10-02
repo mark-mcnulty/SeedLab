@@ -84,7 +84,9 @@ void loop() {
   }
   delay(100);
 }
-
+/*
+* This is where the simulation and control functions will go
+*/
 void CLK_L_ISR() {
   // assign the time
   dif_time_L = micros() - TIME;
