@@ -39,22 +39,11 @@ if __name__ == "__main__":
             # detect the quadrant
             quadrant = cam.detect_quadrant()
 
-            # send the quadrant to the arduino
-            writeNumber(quadrant, 0)
+            # if the quadrant is not none
+            if quadrant != None:
+                # send the quadrant to the arduino
+                writeNumber(quadrant, 0)
 
         except KeyboardInterrupt:
             print("Exiting")
             break
-
-            # var = int(input("Enter 1 – 9: "))
-            # offset = int(input("Enter the offset: "))
-            # if not var:
-            #     continue
-
-            # writeNumber(var,offset)
-            # print ("RPI: Hi Arduino, I sent you ", var, " and offset ", offset)
-            # # sleep one second
-            # time.sleep(1)
-
-            # number = readNumber()
-            # print ("Arduino: Hey RPI, I received a digit and changed it using the offset given: ", number)

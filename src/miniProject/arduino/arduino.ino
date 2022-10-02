@@ -35,6 +35,11 @@ float dif_time_L = 0.0;
 const int wait = 138 ;
 const int pause = 2000 ;
 
+// this is for system integration
+int flag_new_data = 0;
+int state = 0;
+int data[32] = {0} ;
+
 
 //In centimeters Not converted
 float r = 7.6;
@@ -168,9 +173,6 @@ void receiveData(int byteCount){
     Serial.print(data[i]) ;
     Serial.print(" ") ;
     i++ ;
-
-    
-    
   }
   i-- ;
   Serial.println(" ") ;
