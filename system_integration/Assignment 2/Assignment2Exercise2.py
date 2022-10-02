@@ -19,15 +19,10 @@ def readNumber():
 
 while True:
     var = int(input("Enter 1 – 9: "))
-    offset = int(input("Enter the offset: "))
     if not var:
         continue
 
-    writeNumber(var,offset)
-    print ("RPI: Hi Arduino, I sent you ", var, " and offset ", offset)
+    writeNumber(var)
+    print ("RPI: Hi Arduino, I sent you ", var, " and offset ")
     # sleep one second
     time.sleep(1)
-
-    number = readNumber()
-    print ("Arduino: Hey RPI, I received a digit and changed it using the offset given: ", number)
-    print

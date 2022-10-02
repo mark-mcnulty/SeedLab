@@ -30,12 +30,8 @@ void receiveData(int byteCount){
     data[i] = Wire.read();
     Serial.print(data[i]) ;
     Serial.print(" ") ;
-    i++ ;
-
-    
-    
+    i++ ;  
   }
-  i-- ;
   Serial.println(" ") ;
 }
 
