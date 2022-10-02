@@ -14,7 +14,7 @@ def writeNumber(value, offset):
 
 def readNumber():
     #number = bus.read_byte(address)
-    number = bus.read_byte_data(address,0, 32)
+    number = bus.read_byte_data(address, 32)
     return number
 
 if __name__ == "__main__":
