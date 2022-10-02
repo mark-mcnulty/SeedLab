@@ -52,6 +52,8 @@ class arducam:
         red_avg = red/N
         blue_avg = blue/N
         total_gains = (red_avg, blue_avg)
+        print()
+        print(total_gains)
 
         print("red: ", red_avg)
         print("blue: ", blue_avg)
