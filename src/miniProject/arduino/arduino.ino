@@ -15,7 +15,7 @@
 #define ANALOG1 'A1'
 
 // define constants
-#define COUNTS_PER_ROTATION 128
+#define COUNTS_PER_ROTATION 3200
 #define SLAVE_ADDRESS 0x04
 
 DualMC33926MotorShield md;
