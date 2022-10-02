@@ -1,10 +1,9 @@
 
 #include "DualMC33926MotorShield.h"
-#include <Encoder.h>
-//#define CLK_L_PIN 3
-//#define CLK_R_PIN 2
-//#define DT_L_PIN 6
-//#define DT_R_PIN 7
+#define CLK_L_PIN 2
+#define CLK_R_PIN 3
+#define DT_L_PIN 7
+#define DT_R_PIN 8
 
 #define COUNTS_PER_ROTATION 128
 
@@ -25,15 +24,15 @@ float dif_time_L = 0.0;
 const int wait = 138 ;
 const int pause = 2000 ;
 
+
 //In centimeters Not converted
 float r = 7.6;
 int count = 0;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200) ;
   attachInterrupt(digitalPinToInterrupt(CLK_L_PIN), CLK_L_ISR, CHANGE);  // change rising or falling
   attachInterrupt(digitalPinToInterrupt(CLK_R_PIN), CLK_R_ISR, CHANGE);  // pin, function, flag to look for
-  Serial.begin(115200);
   Serial.println("Dual MC33926 Motor Shield");
   DualMC33926MotorShield() ;
   md.init();
@@ -48,13 +47,14 @@ void loop() {
     Serial.print("\t");
     Serial.print(left);
     Serial.print("\t");
-    Serial.println(right;
+    Serial.println(right);
     Direction = 0;
     for (int i = 0; i < 4; i++) {
         md.setM1Speed(400) ;
         delay(wait) ;
         md.setM1Speed(0) ;
         delay(pause) ;
+    }
   }
   delay(100);
 }
