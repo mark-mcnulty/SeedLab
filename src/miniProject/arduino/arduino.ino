@@ -2,6 +2,7 @@
 // all the include libraries
 #include "DualMC33926MotorShield.h"
 #include <Wire.h>
+#define ENCODER_OPTIMIZE_INTERRUPTS
 #include <Encoder.h>
 
 // define the pins
@@ -15,16 +16,16 @@
 #define SLAVE_ADDRESS 0x04
 
 DualMC33926MotorShield md;
-Encoder motorLeft(7,2) ;
+Encoder motorLeft (5,6) ;
 
 
-float left = 0.0;
-float desiredTheta;
+long left = 0;
+float desiredThetaLeft;
 float left_AV = 0.0;
 float leftVelocity = 0.0;
-long positionLeft = -999 ;
+float positionLeft = -999 ;
 float thetaLeft = 0.0;
-long newLeft ;
+float newLeft = 0;
 
 float right = 0.0;
 float desiredRight = 0.0;
@@ -53,8 +54,8 @@ void setup() {
   * simulation and control
   */
   Serial.begin(115200) ;
-  attachInterrupt(digitalPinToInterrupt(CLK_L_PIN), CLK_L_ISR, CHANGE);  // change rising or falling
-  attachInterrupt(digitalPinToInterrupt(CLK_R_PIN), CLK_R_ISR, CHANGE);  // pin, function, flag to look for
+  //attachInterrupt(digitalPinToInterrupt(CLK_L_PIN), CLK_L_ISR, CHANGE);  // change rising or falling
+  //attachInterrupt(digitalPinToInterrupt(CLK_R_PIN), CLK_R_ISR, CHANGE);  // pin, function, flag to look for
   Serial.println("Dual MC33926 Motor Shield");
   DualMC33926MotorShield();
   md.init();
@@ -77,7 +78,9 @@ void setup() {
 }
 
 
+
 void loop() {
+  number = 3;
   float Kp, Ki;
   float I = 0.00;
   float e_past = 0.00;
@@ -85,36 +88,43 @@ void loop() {
   float Tc = millis();
   float error = 0.00;
   float u;
+
+
+
+  thetaLeft= (2*PI* motorLeft.read())/COUNTS_PER_ROTATION;
+  Serial.println(thetaLeft);
+
   
   if (number == 1) {
-    desiredTheta = 0;
+    desiredThetaLeft = 0;
   }
 
   if (number == 2) {
-    desiredTheta = PI/2;
+    desiredThetaLeft = PI/2;
   }
 
   if (number == 3) {
-    desiredTheta = PI;
+    desiredThetaLeft = PI;
   }
 
   if (number == 4) {
-    desiredTheta = (3*PI)/2;
+    desiredThetaLeft = (3*PI)/2;
   } 
 
   //Conditions that drive the motor
-  if (thetaLeft != targetTheta) {
-    if (thetaLeft - targetTheta < 0) {
+  if (thetaLeft != desiredThetaLeft) {
+    if (thetaLeft - desiredThetaLeft < 0) {
       md.setM1Speed(100);
-      calculatePosition();
+      // calculatePosition();
     }
-    if (thetaLeft - targetTheta > 0) {
+    if (thetaLeft - desiredThetaLeft > 0) {
       md.setM1Speed(-100) ;
+      // calculatePosition();
     }
   }
 
   
-  error = desiredTheta - left;
+  error = desiredThetaLeft - left;
 
   I = I + Ts*error;
 
@@ -150,11 +160,12 @@ void sendData(){
     Wire.write(number);
 }
 
-//Calculates Angular position
-void float calculatePosition(){
-  newLeft = motorLeft.read();
-  thetaLeft= (2*PI*newLeft)/COUNTS_PER_ROTATION;
-  Serial.print("Left = ");
-  Serial.println(newLeft) ;
-  delay(100) ;
-}
+////Calculates Angular position
+// void calculatePosition(){
+//   newLeft += motorLeft.read();
+//   Serial.println(newLeft);
+//   thetaLeft= (2*PI*newLeft)/COUNTS_PER_ROTATION;
+//   // Serial.print("Left = ");
+//   // Serial.println(thetaLeft) ;
+//   // delay(100) ;
+// }
