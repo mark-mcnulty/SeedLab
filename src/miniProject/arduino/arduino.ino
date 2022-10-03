@@ -57,9 +57,11 @@ float maxVoltage = 7.7;
 float error = 0.00;
 int step;
 
+float shutOffError = 0.05;
+float windUpTolerance = PI;
 float period = 10;
 float time;
-float Ki = 0.1;
+float Ki = 0.15;
 float I = 0.00;
 float e_past = 0.00;
 float Ts = 0.01;
@@ -141,27 +143,32 @@ void loop() {
   } else {
     digitalWrite(motor1Dir, HIGH);
   }
-
-  // get the error to positive
   error = abs(error);
-  I = I + error*Ts;
 
-  // calculate the voltage you need to apply
-  if (error > PI){
-    voltage = error * Kp;
-  } else {
-    voltage = error * Kp + Ki*I;
+  if (error > shutOffError){
+    // get the error to positive
+    I = I + error*Ts;
+
+    // calculate the voltage you need to apply
+    if (error > windUpTolerance){
+      voltage = error * Kp;
+    } else {
+      voltage = error * Kp + Ki*I;
+    }
+
+    // error correction shouldn't go over max voltage
+    if (voltage > maxVoltage){
+      voltage = maxVoltage;
+    }
+    // assign our steps 
+    step = abs(voltage/maxVoltage) * 255;
+
+    // Conditions that drive the motor
+    analogWrite(motor1Volt, step);
+  } else{
+    analogWrite(motor1Volt, 0);
   }
-
-  // error correction shouldn't go over max voltage
-  if (voltage > maxVoltage){
-    voltage = maxVoltage;
-  }
-  // assign our steps 
-  step = (voltage/maxVoltage) * 255;
-
-  // Conditions that drive the motor
-  analogWrite(motor1Volt, step);
+  
 
   // this will add a delay between operations
   while (millis() < time + period);
