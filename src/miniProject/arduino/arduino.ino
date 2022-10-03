@@ -12,7 +12,7 @@
 // #define DT_R_PIN 8
 
 // define constants
-#define COUNTS_PER_ROTATION 3100
+#define COUNTS_PER_ROTATION 3200
 #define SLAVE_ADDRESS 0x04
 
 //define the encoder
@@ -45,13 +45,13 @@ int count = 0;
 
 // this is for system integration
 // DONT TOUCH
-int number = 1;
+int number = 3;
 int data[32] = {0} ;
 
 
 // this is simulation and control 
 // DONT TOUCH IF YOU ARENT THAT SUBSYSTEM!!!!
-float Kp = 2;
+float Kp = 3;
 float voltage = 0;
 float maxVoltage = 7.7;
 
@@ -102,11 +102,12 @@ void setup() {
   Wire.onRequest(sendData);
 
   Serial.println("Ready!");
+
   digitalWrite(enable, HIGH);
-  // LOW == counter clock wise... positive radians
-  // HIGH == clock wise... negative radians
-  digitalWrite(motor1Dir, HIGH);
-  analogWrite(motor1Volt, 0);
+  // LOW == counter clock wise... negative radians
+  // HIGH == clock wise... positive radians
+  // digitalWrite(motor1Dir, LOW);
+  // analogWrite(motor1Volt, 255);
 }
 
 
@@ -135,17 +136,21 @@ void loop() {
     desiredThetaLeft = (3*PI)/2;
   } 
   
-  // SIMULATION AND CONTROL
+  // // SIMULATION AND CONTROL
   // find the error and the voltage you need to apply 
   error = desiredThetaLeft - thetaLeft;
 
-  if (error < 0){
-    digitalWrite(motor1Dir, HIGH);
-  } else {
+  // find the direction the wheel needs to spin
+  if (error > 0){
     digitalWrite(motor1Dir, LOW);
+  } else {
+    digitalWrite(motor1Dir, HIGH);
   }
+
+  // get the error to positive
   error = abs(error);
 
+  // calculate the voltage you need to apply
   voltage = error * Kp;
 
   // error correction shouldn't go over max voltage
@@ -156,8 +161,6 @@ void loop() {
   step = (voltage/maxVoltage) * 255;
 
   // Conditions that drive the motor
-
-  digitalWrite(motor1Dir, HIGH);
   analogWrite(motor1Volt, step);
 
 }
@@ -184,13 +187,3 @@ void receiveData(int byteCount){
 void sendData(){
     Wire.write(number);
 }
-
-////Calculates Angular position
-// void calculatePosition(){
-//   newLeft += motorLeft.read();
-//   Serial.println(newLeft);
-//   thetaLeft= (2*PI*newLeft)/COUNTS_PER_ROTATION;
-//   // Serial.print("Left = ");
-//   // Serial.println(thetaLeft) ;
-//   // delay(100) ;
-// }
