@@ -10,7 +10,7 @@ import adafruit_character_lcd.character_lcd_rgb_i2c as character_lcd
 # This is the address we setup in the Arduino Program
 # this is the slave address
 address = 0x04
-lcd_update = False 
+
 
 # def writeNumber(value,offset):
 #     #bus.write_byte(address, value)
@@ -24,6 +24,11 @@ lcd_update = False
 
 
 if __name__ == "__main__":
+    # define variables
+    lcd_update = False 
+    old_Quadrant = None
+    quadrant = None
+
     lcd_columns = 16
     lcd_rows = 2
 
@@ -43,7 +48,10 @@ if __name__ == "__main__":
     device = i2c.Device(address, 1)
 
     # setup the lcd
-    lcd.message = str(0)
+    lcd.message = str(1)
+
+    # send the inital 1 to the arduino
+    device.write(0, 1)
 
     # continuously capture images
     while True:
@@ -58,9 +66,11 @@ if __name__ == "__main__":
             quadrant = cam.detect_quadrant()
 
             # if the quadrant is not none
-            if quadrant != None:
+            if quadrant != None and quadrant != old_Quadrant:
                 # send the quadrant to the arduino
+                lcd.message = str(quadrant)
                 device.write8(0, quadrant)
+                old_Quadrant = quadrant
 
         except KeyboardInterrupt:
             print("Exiting")
