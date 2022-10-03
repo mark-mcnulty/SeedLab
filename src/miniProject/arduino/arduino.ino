@@ -54,15 +54,17 @@ int data[32] = {0} ;
 float Kp = 3;
 float voltage = 0;
 float maxVoltage = 7.7;
-
-float Ki;
 float error = 0.00;
+int step;
+
+float period = 10;
+float time;
+float Ki = 0.00;
 float I = 0.00;
 float e_past = 0.00;
-float Ts = 0.00;
-float Tc = millis();
+float Ts = 0.01;
+//float Tc = millis();
 float u;
-int step;
 
 
 void setup() {
@@ -113,26 +115,19 @@ void setup() {
 
 
 void loop() {
-
-
+  // assign values
+  time = millis();
   thetaLeft= (2*PI* motorLeft.read())/COUNTS_PER_ROTATION;
   Serial.println(thetaLeft);
 
-
-  
+  // find the position it needs to go to 
   if (number == 1) {
     desiredThetaLeft = 0;
-  }
-
-  if (number == 2) {
+  }else if (number == 2) {
     desiredThetaLeft = PI/2;
-  }
-
-  if (number == 3) {
+  }else if (number == 3) {
     desiredThetaLeft = PI;
-  }
-
-  if (number == 4) {
+  }else if (number == 4) {
     desiredThetaLeft = (3*PI)/2;
   } 
   
@@ -149,9 +144,10 @@ void loop() {
 
   // get the error to positive
   error = abs(error);
+  I = I + error*Ts;
 
   // calculate the voltage you need to apply
-  voltage = error * Kp;
+  voltage = error * Kp + Ki*I;
 
   // error correction shouldn't go over max voltage
   if (voltage > maxVoltage){
@@ -163,7 +159,9 @@ void loop() {
   // Conditions that drive the motor
   analogWrite(motor1Volt, step);
 
-}
+  // this will add a delay between operations
+  while (millis() < time + period);
+  }
 
 /*
  here is where all the system integration functions will go
