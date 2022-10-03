@@ -106,7 +106,7 @@ void setup() {
   // LOW == counter clock wise... positive radians
   // HIGH == clock wise... negative radians
   digitalWrite(motor1Dir, HIGH);
-  analogWrite(motor1Volt, O);
+  analogWrite(motor1Volt, 0);
 }
 
 
