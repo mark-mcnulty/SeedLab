@@ -134,21 +134,18 @@ void loop() {
   if (number == 4) {
     desiredThetaLeft = (3*PI)/2;
   } 
-
-  //Conditions that drive the motor
-  if (thetaLeft != desiredThetaLeft) {
-    if (thetaLeft - desiredThetaLeft < 0) {
-      // md.setM1Speed(100);
-
-    }
-    if (thetaLeft - desiredThetaLeft > 0) {
-      // md.setM1Speed(-100) ;
-    }
-  }
   
   // SIMULATION AND CONTROL
   // find the error and the voltage you need to apply 
   error = desiredThetaLeft - thetaLeft;
+
+  if (error < 0){
+    digitalWrite(motor1Dir, HIGH);
+  } else {
+    digitalWrite(motor1Dir, LOW);
+  }
+  error = abs(error);
+
   voltage = error * Kp;
 
   // error correction shouldn't go over max voltage
@@ -158,24 +155,11 @@ void loop() {
   // assign our steps 
   step = (voltage/maxVoltage) * 255;
 
-  // analogwrite(3,step);
+  // Conditions that drive the motor
 
+  digitalWrite(motor1Dir, HIGH);
+  analogWrite(motor1Volt, step);
 
-  // if(Ts>0){
-
-  //   D = (error-e_past)/Ts;
-
-  // }
-
-  // I = I + Ts*error;
-
-  // u = Kp*error + Ki*I;
-
-  // Ts = millis() - Tc;
-  // Tc = millis();
-  
-  // if statement to zero encoder
-  // use millis so it works
 }
 
 /*
