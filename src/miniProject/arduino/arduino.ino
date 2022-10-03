@@ -84,7 +84,7 @@ void loop() {
   float Kp, Ki;
   float I = 0.00;
   float e_past = 0.00;
-  float Ts = 0.00;
+  float Ts = 0.10;
   float Tc = millis();
   float error = 0.00;
   float u;
