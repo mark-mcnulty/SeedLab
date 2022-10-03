@@ -9,6 +9,7 @@ import adafruit_character_lcd.character_lcd_rgb_i2c as character_lcd
 # bus = smbus.SMBus(1)
 # This is the address we setup in the Arduino Program
 # this is the slave address
+# adding comments la la la
 address = 0x04
 
 
