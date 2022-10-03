@@ -51,7 +51,7 @@ if __name__ == "__main__":
     lcd.message = str(1)
 
     # send the inital 1 to the arduino
-    device.write(0, 1)
+    device.write8(0, 1)
 
     # continuously capture images
     while True:
