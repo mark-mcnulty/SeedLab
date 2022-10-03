@@ -112,19 +112,7 @@ void setup() {
 
 
 void loop() {
-<<<<<<< HEAD
-=======
-  number = 3;
-  float Kp, Ki;
-  float I = 0.00;
-  float e_past = 0.00;
-  float Ts = 0.10;
-  float Tc = millis();
-  float error = 0.00;
-  float u;
 
-
->>>>>>> 61474c8dc2ea40b82f74773354f90203a2dc4d87
 
   thetaLeft= (2*PI* motorLeft.read())/COUNTS_PER_ROTATION;
   Serial.println(thetaLeft);
