@@ -1,5 +1,5 @@
 #include <DualMC33926MotorShield.h>
-
+#include <Encoder.h>
 
 
 void setup() {
