@@ -45,7 +45,7 @@ int count = 0;
 
 // this is for system integration
 // DONT TOUCH
-int number = 3;
+int number = 4;
 int data[32] = {0} ;
 
 
@@ -59,7 +59,7 @@ int step;
 
 float period = 10;
 float time;
-float Ki = 0.00;
+float Ki = 0.1;
 float I = 0.00;
 float e_past = 0.00;
 float Ts = 0.01;
@@ -147,7 +147,11 @@ void loop() {
   I = I + error*Ts;
 
   // calculate the voltage you need to apply
-  voltage = error * Kp + Ki*I;
+  if (error > PI){
+    voltage = error * Kp;
+  } else {
+    voltage = error * Kp + Ki*I;
+  }
 
   // error correction shouldn't go over max voltage
   if (voltage > maxVoltage){
