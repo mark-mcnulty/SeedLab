@@ -10,6 +10,7 @@ import adafruit_character_lcd.character_lcd_rgb_i2c as character_lcd
 # This is the address we setup in the Arduino Program
 # this is the slave address
 address = 0x04
+lcd_update = False 
 
 # def writeNumber(value,offset):
 #     #bus.write_byte(address, value)
@@ -42,7 +43,7 @@ if __name__ == "__main__":
     device = i2c.Device(address, 1)
 
     # setup the lcd
-    lcd.message = "hello\nWorld"
+    lcd.message = str(0)
 
     # continuously capture images
     while True:
