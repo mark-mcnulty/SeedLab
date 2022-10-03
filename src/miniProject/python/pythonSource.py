@@ -59,14 +59,13 @@ if __name__ == "__main__":
             # capture the image
             cam.capture()
 
-            # display the image
-            cam.display()
-
             # detect the quadrant
             quadrant = cam.detect_quadrant()
 
             # if the quadrant is not none
             if quadrant != None and quadrant != old_Quadrant:
+                            # display the image
+                cam.display()
                 # send the quadrant to the arduino
                 lcd.message = str(quadrant)
                 device.write8(0, quadrant)
