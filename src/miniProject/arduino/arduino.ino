@@ -15,41 +15,68 @@
 #define COUNTS_PER_ROTATION 3100
 #define SLAVE_ADDRESS 0x04
 
+//define the encoder
+int ENCA = 3;
+int ENCB = 2;
 DualMC33926MotorShield md;
-Encoder motorLeft (5,6) ;
+Encoder motorLeft (ENCA, ENCB) ;//5,6 originally
+
+// define the motor pins
+int enable = 4;
+int motor1Volt = 9;
+int motor2Volt = 10;
+int motor1Dir = 7;
+int motor2Dir = 8;
+int statusFlag = 12;
 
 
-long left = 0;
-float desiredThetaLeft;
-float left_AV = 0.0;
-float leftVelocity = 0.0;
-float positionLeft = -999 ;
+
+// localization stuff
+// DONT TOUCH
 float thetaLeft = 0.0;
-float newLeft = 0;
-
-float right = 0.0;
-float desiredRight = 0.0;
-float right_AV = 0.0;
-float rightVelocity = 0.0;
-
+float desiredThetaLeft;
+float thetaRight = 0.0;
 float TIME = 0.0;
 float dif_time_L = 0.0;
-
-
-
 const int wait = 138 ;
 const int pause = 2000 ;
-
-// this is for system integration
-int number = 0;
-int data[32] = {0} ;
-
-
-//In centimeters Not converted
 float r = 7.6;
 int count = 0;
 
+// this is for system integration
+// DONT TOUCH
+int number = 1;
+int data[32] = {0} ;
+
+
+// this is simulation and control 
+// DONT TOUCH IF YOU ARENT THAT SUBSYSTEM!!!!
+float Kp = 2;
+float voltage = 0;
+float maxVoltage = 7.7;
+
+float Ki;
+float error = 0.00;
+float I = 0.00;
+float e_past = 0.00;
+float Ts = 0.00;
+float Tc = millis();
+float u;
+int step;
+
+
 void setup() {
+  /* 
+  * define the motor stuff
+  */
+  pinMode(enable, OUTPUT);
+  pinMode(motor1Dir, OUTPUT);
+  pinMode(motor2Dir, OUTPUT);
+  pinMode(motor1Volt, OUTPUT);
+  pinMode(motor2Volt, OUTPUT);
+  pinMode(statusFlag, INPUT);
+
+
   /*
   * simulation and control
   */
@@ -75,24 +102,20 @@ void setup() {
   Wire.onRequest(sendData);
 
   Serial.println("Ready!");
+  digitalWrite(enable, HIGH);
+  // LOW == counter clock wise... positive radians
+  // HIGH == clock wise... negative radians
+  digitalWrite(motor1Dir, HIGH);
+  analogWrite(motor1Volt, O);
 }
 
 
 
 void loop() {
-  number = 3;
-  float Kp, Ki;
-  float I = 0.00;
-  float e_past = 0.00;
-  float Ts = 0.00;
-  float Tc = millis();
-  float error = 0.00;
-  float u;
-
-
 
   thetaLeft= (2*PI* motorLeft.read())/COUNTS_PER_ROTATION;
   Serial.println(thetaLeft);
+
 
   
   if (number == 1) {
@@ -114,24 +137,41 @@ void loop() {
   //Conditions that drive the motor
   if (thetaLeft != desiredThetaLeft) {
     if (thetaLeft - desiredThetaLeft < 0) {
-      md.setM1Speed(100);
-      // calculatePosition();
+      // md.setM1Speed(100);
+
     }
     if (thetaLeft - desiredThetaLeft > 0) {
-      md.setM1Speed(-100) ;
-      // calculatePosition();
+      // md.setM1Speed(-100) ;
     }
   }
-
   
-  error = desiredThetaLeft - left;
+  // SIMULATION AND CONTROL
+  // find the error and the voltage you need to apply 
+  error = desiredThetaLeft - thetaLeft;
+  voltage = error * Kp;
 
-  I = I + Ts*error;
+  // error correction shouldn't go over max voltage
+  if (voltage > maxVoltage){
+    voltage = maxVoltage;
+  }
+  // assign our steps 
+  step = (voltage/maxVoltage) * 255;
 
-  u = Kp*error + Ki*I;
+  // analogwrite(3,step);
 
-  Ts = millis() - Tc;
-  Tc = millis();
+
+  // if(Ts>0){
+
+  //   D = (error-e_past)/Ts;
+
+  // }
+
+  // I = I + Ts*error;
+
+  // u = Kp*error + Ki*I;
+
+  // Ts = millis() - Tc;
+  // Tc = millis();
   
   // if statement to zero encoder
   // use millis so it works
