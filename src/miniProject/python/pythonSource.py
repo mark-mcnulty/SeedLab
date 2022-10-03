@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
             # if the quadrant is not none
             if quadrant != None and quadrant != old_Quadrant:
-                            # display the image
+                # display the image
                 cam.display()
                 # send the quadrant to the arduino
                 lcd.message = str(quadrant)

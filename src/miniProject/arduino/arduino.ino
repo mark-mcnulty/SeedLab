@@ -132,6 +132,7 @@ void loop() {
   }else if (number == 4) {
     desiredThetaLeft = (3*PI)/2;
   } 
+
   
   // // SIMULATION AND CONTROL
   // find the error and the voltage you need to apply 
@@ -171,8 +172,11 @@ void loop() {
   
 
   // this will add a delay between operations
-  while (millis() < time + period);
+  while (millis() < time + period); // change this to if
+  if (millis() < time + period) {
+    // do nothing
   }
+}
 
 /*
  here is where all the system integration functions will go
