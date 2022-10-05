@@ -62,7 +62,7 @@ float windUpTolerance = PI;
 float period = 10;
 float time;
 float t_past;
-float Ki = 0.77;
+float Ki = 1.1;
 float I = 0.00;
 float u;
 
