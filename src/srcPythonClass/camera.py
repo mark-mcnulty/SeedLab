@@ -12,7 +12,8 @@ class arducam:
     # define a function to initalize the object 
     def __init__(self):
         self.camera = picamera.PiCamera()
-        self.FV = 53.50
+        self.FV_X = 53.50
+        self.FV_Y = 41.41 
         time.sleep(2)
 
     # define a function to capture images with the camera
@@ -120,7 +121,8 @@ class arducam:
         #                        corners[0][0][0][1] -> y
         #                        corners[0][0][1][0] -> 2nd corner of the id marker 0
         return ids, corners
-
+ 
+    # define a function that will calculate the angle between the camera and the marker
     def get_marker_location(name="image.jpg"):
         FOV = 53.50
         # check that the name has the correct extension
@@ -246,6 +248,14 @@ class arducam:
 
         else:
             return None
+
+    # define a function that will calculate the camera matrix
+    # this matrix is how the camera sees the world
+    # the camera matrix is used to calculate the rotation and translation vectors
+    def get_camera_matrix(self, name="image.jpg"):
+        print("getting camera matrix")
+
+    
 
 
 if __name__ == "__main__":
