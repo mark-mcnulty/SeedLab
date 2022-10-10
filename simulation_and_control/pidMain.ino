@@ -164,6 +164,7 @@ void loop() {
     // error correction shouldn't go over max voltage and anti windup
     if (voltage > maxVoltage) {
       voltage = maxVoltage;
+      I = 0;
       // add anti windup properly here LATER
     }
 
