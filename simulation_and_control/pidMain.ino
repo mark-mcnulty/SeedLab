@@ -163,8 +163,8 @@ void loop() {
 
     // error correction shouldn't go over max voltage and anti windup
     if (voltage > maxVoltage) {
-      I = 0; // anti windup resets integral
       voltage = maxVoltage;
+      // add anti windup properly here LATER
     }
 
     // assign our steps 
@@ -177,7 +177,7 @@ void loop() {
   }
 
     t_past = time;
-
+  
   // this will add a delay between operations
   while (millis() < time + period); // change this to if
 
