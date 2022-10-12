@@ -45,7 +45,7 @@ int count = 0;
 
 // this is for system integration
 // DONT TOUCH
-int number = 4;
+int number = 3;
 int data[32] = {0} ;
 
 
@@ -148,18 +148,13 @@ void loop() {
   if (error > shutOffError){
 
     //calculate the voltage you need to apply
-    if (error > windUpTolerance){
-      // Serial.println("error");
-      // Serial.println(error);
-      voltage = error * Kp;
-    } else {
-      I = I + error*((time - t_past)/1000); // convert to millis
+    I = I + error*((time - t_past)/1000); // convert to millis
 
-      // Serial.println("Integral");
-      //Serial.println(I);
+    //Serial.println("Integral");
+    Serial.println(I);
 
-      voltage = error * Kp + Ki*I;
-    }
+    voltage = error * Kp + Ki*I;
+    
 
     // error correction shouldn't go over max voltage and anti windup
     if (voltage > maxVoltage) {
