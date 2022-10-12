@@ -12,8 +12,8 @@ class arducam:
     # define a function to initalize the object 
     def __init__(self):
         self.camera = picamera.PiCamera()
-        self.FV_X = 53.50
-        self.FV_Y = 41.41 
+        self.FOV_X = 53.50
+        self.FOV_Y = 41.41 
         time.sleep(2)
 
     # define a function to capture images with the camera
@@ -123,8 +123,7 @@ class arducam:
         return ids, corners
  
     # define a function that will calculate the angle between the camera and the marker
-    def get_marker_location(name="image.jpg"):
-        FOV = 53.50
+    def get_marker_location(self, name="image.jpg"):
         # check that the name has the correct extension
         if name[-4:] != ".jpg":
             name = name + ".jpg"
@@ -159,16 +158,19 @@ class arducam:
                     if corners[x][0][i][0] > max_x:
                         max_x = corners[0][0][i][0]
 
-                # find the center of the image
+                # find the center of the aruco marker
                 centerObject = (min_x + max_x) / 2
-                print(centerObject)
 
-                # find the angle 
-                # feild of view divided by two multiplied by the ratio:
-                # (center of the image - center of the screen) / (center of the screen - right side of the screen)
-                angle = (FOV / 2) * ( (abs(centerObject - center[0])) / (abs(center[0] - size[0])) )
+                # if the center of the aruco marker is less than the center of the image
+                # then the aruco marker is to the left of the center of the image making the angle negative
+                if centerObject < center[0]:
+                    angle = -1 * (self.FOV_X / 2) * ( (abs(centerObject - center[0])) / (abs(center[0] - size[0])) )
+                else:
+                    angle = (self.FOV_X / 2) * ( (abs(centerObject - center[0])) / (abs(center[0] - size[0])) )
+
+                # return the angle
                 print("marker", str(x), angle)
-            
+                return angle
             
         else:
             print("No markers detected")
