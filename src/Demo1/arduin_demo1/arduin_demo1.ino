@@ -32,6 +32,8 @@ float desiredThetaLeft;
 float thetaRight = 0.0;
 float desiredThetaRight;
 float r = 7.6;
+float goto_angle = 180;
+float goto_position = 0.0;
 
 
 void setup() {
@@ -54,36 +56,48 @@ void setup() {
 void loop() {
   //Read time at the start of loop for controls
   time = millis();
+
   //Getting desired angle and distance from computer vision
 
   //Convert angle needed to rotate into radians. 
-  desiredTheata = (desiredAngle*PI) / 180;
+  // desired angle is in degrees
+  goto_theata = (goto_angle*PI) / 180;
+  
   //Calculate how much each wheel needs to rotate in order to move the robot
-  desredThetaLeft = 2*desiredTheta;
-  desiredThetaRight = desiredThetaLeft;
+  desiredThetaLeft = 2*goto_theata;
+  desiredThetaRight = 2*goto_theata;
   
   //Reading Left Encoder
   thetaLeft= (2*PI* motorLeft.read())/COUNTS_PER_ROTATION;
-  Serial.println(thetaLeft);
+  // Serial.println(thetaLeft);
+
   //Reading Right Encoder
   thetaRight= (2*PI* motorRight.read())/COUNTS_PER_ROTATION;
-  Serial.println(thetaRight);
+  // Serial.println(thetaRight);
 
   //Simulation and Control Calculates Velocity pushed to each wheel. 
   // find the error and the voltage you need to apply 
   errorLeft = desiredThetaLeft - thetaLeft;
   errorRight = desiredThetaRight - thetaRight;
 
-  //Control the left wheel
 
+  // assign the direction
    if (errorLeft > 0){
     digitalWrite(motor1Dir, LOW);
   } else {
     digitalWrite(motor1Dir, HIGH);
   }
 
+  if (errorRight > 0){
+    digitalWrite(motor2Dir, LOW);
+  } else {
+    digitalWrite(motor2Dir, HIGH);
+  }
+
   // get the error to positive
   errorLeft = abs(errorLeft);
+  errorRight = abs(errorRight);
+
 
   if (errorLeft > shutOffErrorLeft){
 
@@ -113,14 +127,8 @@ void loop() {
 
 
 //Controls for  the right wheel
-   if (errorRight > 0){
-    digitalWrite(motor2Dir, LOW);
-  } else {
-    digitalWrite(motor2Dir, HIGH);
-  }
 
-  // get the error to positive
-  errorRight = abs(errorRight);
+
 
   if (errorRight > shutOffErrorRight){
 
@@ -148,14 +156,11 @@ void loop() {
     analogWrite(motor2Volt, 0);
   }
 
-//Calculate robot position and velocity using given quations
+  //Calculate robot position and velocity using given quations
 
-    t_past = time;
+  t_past = time;
   
   // this will add a delay between operations
   while (millis() < time + period); // change this to if
-
-
-
 
 }
