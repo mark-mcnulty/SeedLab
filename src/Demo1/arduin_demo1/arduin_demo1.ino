@@ -7,6 +7,15 @@
 #define COUNTS_PER_ROTATION 3200
 #define SLAVE_ADDRESS 0x04
 
+// define the pins
+//HELLO WORLSD
+#define ENCL1_LEFT 3
+#define ENCL2_LEFT 4
+#define ENCR1_RIGHT 2
+#define ENCR2_RIGHT 5
+Encoder motorRight (ENCR1_RIGHT, ENCR2_RIGHT);
+Encoder motorLeft (ENCL1_LEFT, ENCL2_LEFT);
+
 // define the motor pins
 int enable = 4;
 int motor1Volt = 9;
@@ -17,14 +26,7 @@ int statusFlag = 12;
 
 //Localization Encoder and Motor decleration
 DualMC33926MotorShield md;
-//define the  left encoder
-int ENCL1 = 3;
-int ENCL2 = 4;
-Encoder motorLeft (ENCL1, ENCL2;
-//define the right enconder
-int ENCR1 = 2;
-int ENCR2 = 5;
-Encoder motorRight (ENCR1, ENCR2);
+
 
 //Localization position variablles
 float thetaLeft = 0.0;
@@ -34,6 +36,29 @@ float desiredThetaRight;
 float r = 7.6;
 float goto_angle = 180;
 float goto_position = 0.0;
+float goto_theata;
+float errorLeft;
+float errorRight;
+int stepRight;
+int stepLeft;
+float voltageRight;
+float voltageLeft;
+
+
+// 
+float Kp = 4;
+float voltage = 0;
+float maxVoltage = 7.7;
+
+
+float shutOffError = 0.05;
+float windUpTolerance = PI;
+float period = 10;
+float start_time;
+float t_past;
+float Ki = 1.1;
+float I = 0.00;
+float u;
 
 
 void setup() {
@@ -47,15 +72,15 @@ void setup() {
   pinMode(motor1Volt, OUTPUT);
   pinMode(motor2Volt, OUTPUT);
   pinMode(statusFlag, INPUT);
-
-
 }
+
+
 //Need to get in angle convert to radians
 //Each wheel rotates desired angle in rads * 2. Each wheel rotates in oposite direction
 //Calculate error for each wheel
 void loop() {
   //Read time at the start of loop for controls
-  time = millis();
+  start_time = millis();
 
   //Getting desired angle and distance from computer vision
 
@@ -99,20 +124,20 @@ void loop() {
   errorRight = abs(errorRight);
 
 
-  if (errorLeft > shutOffErrorLeft){
+  if (errorLeft > shutOffError){
 
     //calculate the voltage you need to apply
-    if (errorLeft > windUpToleranceLeft){
-      voltageLeft = errorLeft * KpLeft;
+    if (errorLeft > windUpTolerance){
+      voltageLeft = errorLeft * Kp;
     } else {
-      ILeft = ILeft + errorLeft*((time - t_past)/1000); // convert to millis
-      voltageLeft = errorLeft * KpLeft + KiLeft*ILeft;
+      I = I + errorLeft*((start_time - t_past)/1000); // convert to millis
+      voltageLeft = errorLeft * Kp + Ki*I;
     }
 
     // error correction shouldn't go over max voltage and anti windup
     if (voltageLeft > maxVoltage) {
       voltageLeft = maxVoltage;
-      ILeft = 0;
+      I = 0;
       // add anti windup properly here LATER
     }
 
@@ -120,7 +145,7 @@ void loop() {
     stepLeft = abs(voltageLeft/maxVoltage) * 255;
 
     // Conditions that drive the motor
-    analogWrite(motor1Volt, step);
+    analogWrite(motor1Volt, stepLeft);
   } else{
     analogWrite(motor1Volt, 0);
   }
@@ -130,20 +155,20 @@ void loop() {
 
 
 
-  if (errorRight > shutOffErrorRight){
+  if (errorRight > shutOffError){
 
     //calculate the voltage you need to apply
-    if (errorRight > windUpToleranceRight){
-      voltageRight = errorRight * KpRight;
+    if (errorRight > windUpTolerance){
+      voltageRight = errorRight * Kp;
     } else {
-      IRight = IRight + errorRight*((time - t_past)/1000); // convert to millis
-      voltageRight = errorRight * KpRight + KiRight*IRight;
+      I = I + errorRight*((start_time - t_past)/1000); // convert to millis
+      voltageRight = errorRight * Kp + Ki*I;
     }
 
     // error correction shouldn't go over max voltage and anti windup
     if (voltageRight > maxVoltage) {
       voltageRight = maxVoltage;
-      IRight = 0;
+      I = 0;
       // add anti windup properly here LATER
     }
 
@@ -151,16 +176,16 @@ void loop() {
     stepRight = abs(voltageRight/maxVoltage) * 255;
 
     // Conditions that drive the motor
-    analogWrite(motor2Volt, step);
+    analogWrite(motor2Volt, stepRight);
   } else{
     analogWrite(motor2Volt, 0);
   }
 
   //Calculate robot position and velocity using given quations
 
-  t_past = time;
+  t_past = start_time;
   
   // this will add a delay between operations
-  while (millis() < time + period); // change this to if
+  while (millis() < start_time + period); // change this to if
 
 }
