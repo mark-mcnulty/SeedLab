@@ -35,7 +35,7 @@ class arducam:
         self.marker_size = 5
 
         # set the type of aruco marker
-        self.aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_50)
+        self.aruco_dict = cv2.aruco.DICT_6X6_50
         
         time.sleep(2)
 
