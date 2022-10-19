@@ -282,6 +282,8 @@ if __name__ == "__main__":
             # capture the image
             cam.capture()
 
+            cam.display()
+
             # detect the angle
             angle = cam.get_marker_location()
 
