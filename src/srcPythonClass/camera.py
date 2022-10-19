@@ -183,11 +183,9 @@ class arducam:
                     angle = (self.FOV_X / 2) * ( (abs(centerObject - center[0])) / (abs(center[0] - size[0])) )
 
                 # return the angle
-                print("marker", str(x), angle)
                 return angle
             
         else:
-            print("No markers detected")
             return None
     
     # define a function that detects the quadrant the aruco marker
@@ -284,21 +282,24 @@ if __name__ == "__main__":
             # capture the image
             cam.capture()
 
-            # # display the image
-            # cam.display()
 
-            # detect the quadrant
-            quadrant = cam.detect_quadrant()
+            # detect the angle
+            angle = cam.get_marker_location()
 
             # print the quadrant
-            print(quadrant)
+            print(angle)
+
+
         # if there is a keyboard interrupt
         # exit the program
+        # make sure to use ctrl + c to exit
+        # ctrl + z will pause the program and not exit
+        # this will result in the camera getting hung up
         except KeyboardInterrupt:
             print("Exiting")
             # close the camera
             cam.close()
-            
+
             break
 
         # just for fun
