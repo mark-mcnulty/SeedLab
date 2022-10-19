@@ -34,7 +34,7 @@ float desiredThetaLeft;
 float thetaRight = 0.0;
 float desiredThetaRight;
 float r = 7.6;
-float goto_angle = 180;
+float goto_angle = 270;
 float goto_position = 0.0;
 float goto_theata;
 float errorLeft;
