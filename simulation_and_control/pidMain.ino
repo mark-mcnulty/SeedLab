@@ -58,7 +58,7 @@ float error = 0.00;
 int step;
 
 float shutOffError = 0.05;
-float windUpTolerance = PI;
+float windUpTolerance = PI/2.3;
 float period = 10;
 float time;
 float t_past;
@@ -142,24 +142,33 @@ void loop() {
   } else {
     digitalWrite(motor1Dir, HIGH);
   }
+
   // get the error to positive
   error = abs(error);
 
-  if (error > shutOffError){
+  if (error > shutOffError) {
 
     //calculate the voltage you need to apply
-    I = I + error*((time - t_past)/1000); // convert to millis
 
+    if (error > windUpTolerance) {
+
+      I = 0;
+
+    } else {
+
+      I = I + error*((time - t_past)/1000); // convert to millis
+
+    }
     //Serial.println("Integral");
     Serial.println(I);
-
+    //Serial.println(thetaLeft);
     voltage = error * Kp + Ki*I;
     
 
     // error correction shouldn't go over max voltage and anti windup
     if (voltage > maxVoltage) {
       voltage = maxVoltage;
-      I = 0;
+      //I = 0;
       // add anti windup properly here LATER
     }
 
@@ -168,7 +177,7 @@ void loop() {
 
     // Conditions that drive the motor
     analogWrite(motor1Volt, step);
-  } else{
+  } else {
     analogWrite(motor1Volt, 0);
   }
 
