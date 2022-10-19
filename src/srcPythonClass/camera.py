@@ -296,12 +296,13 @@ if __name__ == "__main__":
         # exit the program
         except KeyboardInterrupt:
             print("Exiting")
+            # close the camera
+            cam.close()
+            
             break
 
         # just for fun
         print()
 
 
-    # close the camera
-    cam.close()
 
