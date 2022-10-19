@@ -58,7 +58,7 @@ float maxVoltage = 7.7;
 
 float shutOffError = 0.05;
 float shutOffDistance = 5;
-float windUpTolerance = PI;
+float windUpTolerance = PI/2.3; // smaller anti windup for I
 float period = 10;
 float start_time;
 float t_past;
@@ -135,8 +135,9 @@ void loop() {
   if (errorLeft > shutOffError){
 
     //calculate the voltage you need to apply
-    if (errorLeft > windUpTolerance){
+    if (errorLeft > windUpTolerance) {
       voltageLeft = errorLeft * Kp;
+      I = 0; // anti-windup
     } else {
       I = I + errorLeft*((start_time - t_past)/1000); // convert to millis
       voltageLeft = errorLeft * Kp + Ki*I;
@@ -145,7 +146,7 @@ void loop() {
     // error correction shouldn't go over max voltage and anti windup
     if (voltageLeft > maxVoltage) {
       voltageLeft = maxVoltage;
-      I = 0;
+      //I = 0; removed
       // add anti windup properly here LATER
     }
 
@@ -166,6 +167,7 @@ void loop() {
     //calculate the voltage you need to apply
     if (errorRight > windUpTolerance){
       voltageRight = errorRight * Kp;
+      I = 0; // anti windup
     } else {
       I = I + errorRight*((start_time - t_past)/1000); // convert to millis
       voltageRight = errorRight * Kp + Ki*I;
@@ -174,7 +176,7 @@ void loop() {
     // error correction shouldn't go over max voltage and anti windup
     if (voltageRight > maxVoltage) {
       voltageRight = maxVoltage;
-      I = 0;
+      //I = 0; removed
       // add anti windup properly here LATER
     }
 
@@ -207,7 +209,7 @@ void loop() {
     digitalWrite(motorLDir, LOW);
     digitalWrite(motorRDir, HIGH);
 
-  } else{
+  } else {
     digitalWrite(motorLDir, HIGH);
     digitalWrite(motorRDir, LOW);
   }
