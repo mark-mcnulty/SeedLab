@@ -205,7 +205,7 @@ void loop() {
   errorDistance = goto_distance - distance;
 
   //Set direction of the two motors
-  if (errorDistance > 0 ){
+  if (errorDistance > 0 ) {
     digitalWrite(motorLDir, LOW);
     digitalWrite(motorRDir, HIGH);
 
