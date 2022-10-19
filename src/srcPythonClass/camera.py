@@ -284,8 +284,8 @@ if __name__ == "__main__":
             # capture the image
             cam.capture()
 
-            # display the image
-            cam.display()
+            # # display the image
+            # cam.display()
 
             # detect the quadrant
             quadrant = cam.detect_quadrant()
