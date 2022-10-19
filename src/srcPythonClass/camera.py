@@ -79,7 +79,7 @@ class arducam:
         # display the image
         img = cv2.imread(name)
         cv2.imshow("image", img)
-        cv2.waitKey(1000)
+        cv2.waitKey(500)
         cv2.destroyAllWindows()
 
     # define a function to resize the image
@@ -281,7 +281,6 @@ if __name__ == "__main__":
         try:
             # capture the image
             cam.capture()
-
 
             # detect the angle
             angle = cam.get_marker_location()
