@@ -4,6 +4,20 @@ import cv2
 import numpy
 
 
+'''
+NOTES:  
+    - The aruco marker size is 5cm x 5cm
+    - The field of view of the camera x is 62.2 degrees
+    - the field of view of the camera y is 48.8 degrees
+
+TODO:
+    - Speed up marker detection
+    - Make the camera class a singleton
+    - Make the camera class a thread
+    - Make the camera class a thread that can be started and stopped
+    - Make the camera class a thread that can be started and stopped and restarted
+'''
+
 # define the class for the camera
 class arducam:
     '''
@@ -278,6 +292,8 @@ if __name__ == "__main__":
 
             # print the quadrant
             print(quadrant)
+        # if there is a keyboard interrupt
+        # exit the program
         except KeyboardInterrupt:
             print("Exiting")
             break
