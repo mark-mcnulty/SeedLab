@@ -18,10 +18,10 @@ Encoder motorLeft (ENCL1_LEFT, ENCL2_LEFT);
 
 // define the motor pins
 int enable = 4;
-int motor1Volt = 9;
-int motor2Volt = 10;
-int motor1Dir = 7;
-int motor2Dir = 8;
+int motorLVolt = 9;
+int motorRVolt = 10;
+int motorLDir = 7;
+int motorRDir = 8;
 int statusFlag = 12;
 
 //Localization Encoder and Motor decleration
@@ -29,6 +29,8 @@ DualMC33926MotorShield md;
 
 
 //Localization position variablles
+//All distance and measurements are in centimeters
+//All theta variables should be in radians and angle is in degree
 float thetaLeft = 0.0;
 float desiredThetaLeft;
 float thetaRight = 0.0;
@@ -37,6 +39,9 @@ float r = 7.6;
 float goto_angle = 270;
 float goto_position = 0.0;
 float goto_theata;
+float goto_distance = 300;
+float distance = 0.0;
+float errorDistance;
 float errorLeft;
 float errorRight;
 int stepRight;
@@ -45,13 +50,14 @@ float voltageRight;
 float voltageLeft;
 
 
-// 
+// Controls variables - Should be the first thing messed with
 float Kp = 4;
 float voltage = 0;
 float maxVoltage = 7.7;
 
 
 float shutOffError = 0.05;
+float shutOffDistance = 5;
 float windUpTolerance = PI;
 float period = 10;
 float start_time;
@@ -67,10 +73,10 @@ void setup() {
   * define the motor stuff
   */
   pinMode(enable, OUTPUT);
-  pinMode(motor1Dir, OUTPUT);
-  pinMode(motor2Dir, OUTPUT);
-  pinMode(motor1Volt, OUTPUT);
-  pinMode(motor2Volt, OUTPUT);
+  pinMode(motorLDir, OUTPUT);
+  pinMode(motorRDir, OUTPUT);
+  pinMode(motorLVolt, OUTPUT);
+  pinMode(motorRVolt, OUTPUT);
   pinMode(statusFlag, INPUT);
 }
 
@@ -108,15 +114,15 @@ void loop() {
 
   // assign the direction
    if (errorLeft > 0){
-    digitalWrite(motor1Dir, LOW);
+    digitalWrite(motorLDir, LOW);
   } else {
-    digitalWrite(motor1Dir, HIGH);
+    digitalWrite(motorLDir, HIGH);
   }
 
   if (errorRight > 0){
-    digitalWrite(motor2Dir, LOW);
+    digitalWrite(motorRDir, LOW);
   } else {
-    digitalWrite(motor2Dir, HIGH);
+    digitalWrite(motorRDir, HIGH);
   }
 
   // get the error to positive
@@ -124,6 +130,8 @@ void loop() {
   errorRight = abs(errorRight);
 
 
+//Controls for the left wheel 
+ 
   if (errorLeft > shutOffError){
 
     //calculate the voltage you need to apply
@@ -145,15 +153,13 @@ void loop() {
     stepLeft = abs(voltageLeft/maxVoltage) * 255;
 
     // Conditions that drive the motor
-    analogWrite(motor1Volt, stepLeft);
+    analogWrite(motorLVolt, stepLeft);
   } else{
-    analogWrite(motor1Volt, 0);
+    analogWrite(motorLVolt, 0);
   }
 
 
 //Controls for  the right wheel
-
-
 
   if (errorRight > shutOffError){
 
@@ -176,9 +182,9 @@ void loop() {
     stepRight = abs(voltageRight/maxVoltage) * 255;
 
     // Conditions that drive the motor
-    analogWrite(motor2Volt, stepRight);
+    analogWrite(motorRVolt, stepRight);
   } else{
-    analogWrite(motor2Volt, 0);
+    analogWrite(motorRVolt, 0);
   }
 
   //Calculate robot position and velocity using given quations
@@ -187,5 +193,37 @@ void loop() {
   
   // this will add a delay between operations
   while (millis() < start_time + period); // change this to if
+
+
+
+
+  // This part will make the robot travel forward
+  
+  //First get the distance and ccalculate the error in distance
+  errorDistance = goto_distance - distance;
+
+  //Set direction of the two motors
+  if (errorDistance > 0 ){
+    digitalWrite(motorLDir, LOW);
+    digitalWrite(motorRDir, HIGH);
+
+  } else{
+    digitalWrite(motorLDir, HIGH);
+    digitalWrite(motorRDir, LOW);
+  }
+
+  //Control the robot to move
+  if (errorDistance >= shutOffDistance){
+   //Reset the position of each wheel to 0
+    thetaLeft = 0;
+    thetaRight = 0;
+  
+    //Controls calculates the Kp Ki and voltages
+
+    
+
+  }
+
+
 
 }
