@@ -26,8 +26,17 @@ class arducam:
     # define a function to initalize the object 
     def __init__(self):
         self.camera = picamera.PiCamera()
+
+        # set the field of view
         self.FOV_X = 53.50
         self.FOV_Y = 41.41 
+
+        # set the aruco marker size
+        self.marker_size = 5
+
+        # set the type of aruco marker
+        self.aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_50)
+        
         time.sleep(2)
 
     # define a function to capture images with the camera
@@ -154,7 +163,7 @@ class arducam:
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         # detect the markers
-        aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_6X6_50)
+        aruco_dict = cv2.aruco.Dictionary_get(self.aruco_dict)
         parameters =  cv2.aruco.DetectorParameters_create()
         corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
 
