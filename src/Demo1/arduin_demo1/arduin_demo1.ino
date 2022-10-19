@@ -185,7 +185,7 @@ void loop() {
 
     // Conditions that drive the motor
     analogWrite(motorRVolt, stepRight);
-  } else{
+  } else {
     analogWrite(motorRVolt, 0);
   }
 
@@ -215,7 +215,7 @@ void loop() {
   }
 
   //Control the robot to move
-  if (errorDistance >= shutOffDistance){
+  if (errorDistance >= shutOffDistance) {
    //Reset the position of each wheel to 0
     thetaLeft = 0;
     thetaRight = 0;
