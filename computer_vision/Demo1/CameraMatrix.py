@@ -6,16 +6,10 @@ path_src_python = path_src_python.replace("\\","/")
 sys.path.append(path_src_python )
 
 #import the stuff
-import camera
+# import camera
 import cv2
 import numpy as np
 import glob 
-
-# define variables
-number_of_squares_X = 10
-number_of_squares_Y = 7
-nX = number_of_squares_X - 1
-nY = number_of_squares_Y - 1
 
 # camera matrix is defined as a 3x3 matrix
 #
@@ -31,7 +25,7 @@ nY = number_of_squares_Y - 1
 
 if __name__ == "__main__":
     # define the dimensions of checkerboard
-    CHECKERBOARD = (6,9)
+    CHECKERBOARD = (11,8)
 
     # stop the iteration when specified accuracy, epsilon, is reached or
     # specified number of iterations are completed.
@@ -56,7 +50,7 @@ if __name__ == "__main__":
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         # find the chess board corners
-        ret, corners = cv2.findChessboardCorners(gray, CHECKERBOARD, cv2.CALIB_CB_ADAPTIVE_THRESH + cv2.CALIB_CB_FAST_CHECK + cv2.CALIB_CB_NORMALIZE_IMAGE)
+        ret, corners = cv2.findChessboardCorners(gray, CHECKERBOARD, CHECKERBOARD, None)
 
         if ret == True:
             threedpoints.append(objectp3d)
@@ -68,12 +62,10 @@ if __name__ == "__main__":
 
             # Draw and display the corners
             img = cv2.drawChessboardCorners(img, CHECKERBOARD, corners2, ret)
-        cv2.imshow('img', img)
+        cv2.imshow('img', gray)
         cv2.waitKey(0)
 
 cv2.destroyAllWindows()
-
-h,w = img.shape[:2]
 
 #performing camera calibration by
 #passing the value of known 3D points (threedpoints)
