@@ -11,6 +11,24 @@ import cv2
 import numpy as np
 import glob 
 
+# define variables
+number_of_squares_X = 10
+number_of_squares_Y = 7
+nX = number_of_squares_X - 1
+nY = number_of_squares_Y - 1
+
+# camera matrix is defined as a 3x3 matrix
+#
+# [ fx  0  cx ]
+# [  0 fy  cy ]
+# [  0  0   1 ]
+# 
+# 
+# This link below is the best resource I have found for camera calibration
+# https://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html
+# 
+# https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
+
 if __name__ == "__main__":
     # define the dimensions of checkerboard
     CHECKERBOARD = (6,9)
