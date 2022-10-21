@@ -239,7 +239,7 @@ void loop() {
       voltageDistance = errorDistance * Kp;
     } else {
       I_D = I_D + errorDistance*((start_time - t_past)/1000); // convert to millis
-      voltageDistance = errorDisstance * Kp_D + Ki_D*I_D;
+      voltageDistance = errorDistance * Kp_D + Ki_D*I_D;
     }
 
     // error correction shouldn't go over max voltage and anti windup
@@ -257,7 +257,7 @@ void loop() {
     analogWrite(motorRVolt, stepDistance);
 
     //Calculate distance the robot has traveled
-    distane = (r/2)*(thetaLeft + thtaRight);
+    distance = (r/2)*(thetaLeft + thetaRight);
     
   } else{
     analogWrite(motorLVolt, 0);
