@@ -158,8 +158,6 @@ void loop() {
     // error correction shouldn't go over max voltage and anti windup
     if (voltageLeft > maxVoltage) {
       voltageLeft = maxVoltage;
-      //I = 0;
-      // add anti windup properly here LATER
     }
 
     // assign our steps 
@@ -179,7 +177,6 @@ void loop() {
     //calculate the voltage you need to apply
     if (errorRight > windUpTolerance) {
       voltageRight = errorRight * Kp;
-      I = 0;
     } else {
       I = I + errorRight*((start_time - t_past)/1000); // convert to millis
       voltageRight = errorRight * Kp + Ki*I;
@@ -188,8 +185,6 @@ void loop() {
     // error correction shouldn't go over max voltage and anti windup
     if (voltageRight > maxVoltage) {
       voltageRight = maxVoltage;
-      //I = 0;
-      // add anti windup properly here LATER
     }
 
     // assign our steps 
