@@ -31,39 +31,50 @@ DualMC33926MotorShield md;
 //Localization position variablles
 //All distance and measurements are in centimeters
 //All theta variables should be in radians and angle is in degree
+
+//Robot Angle Variables
+float goto_theata;
+float goto_angle = 270;
+float shutOffError = 0.05;
+
+//Left Wheel Variables
 float thetaLeft = 0.0;
 float desiredThetaLeft;
+float errorLeft;
+float voltageLeft;
+int stepLeft;
+
+//Right Wheel Variable
 float thetaRight = 0.0;
 float desiredThetaRight;
-float r = 7.6;
-float goto_angle = 270;
-float goto_position = 0.0;
-float goto_theata;
-float goto_distance = 300;
-float distance = 0.0;
-float errorDistance;
-float errorLeft;
 float errorRight;
-int stepRight;
-int stepLeft;
 float voltageRight;
-float voltageLeft;
+int stepRight;
 
+//Distance Variable
+float distance = 0.0;
+float goto_distance = 300;
+float errorDistance;
+float voltageDistance;
+float stepDistance;
+float shutOffDistance = 5;
 
 // Controls variables - Should be the first thing messed with
 float Kp = 4;
-float voltage = 0;
-float maxVoltage = 7.7;
-
-
-float shutOffError = 0.05;
-float shutOffDistance = 5;
+float Ki = 1.1;
+float I = 0.00;
 float windUpTolerance = PI;
+//Distance Contrrol Variables
+float Kp_D = 3.5;
+float Ki_D = 1.0;
+float I_D = 0.00;
+
+//Constants
+float maxVoltage = 7.7;
 float period = 10;
 float start_time;
 float t_past;
-float Ki = 1.1;
-float I = 0.00;
+float r = 7.6;
 float u;
 
 
@@ -227,14 +238,14 @@ void loop() {
     if (errorDistance > windUpTolerance){
       voltageDistance = errorDistance * Kp;
     } else {
-      I = I + errorDistance*((start_time - t_past)/1000); // convert to millis
-      voltageDistance = errorDisstance * Kp + Ki*I;
+      I_D = I_D + errorDistance*((start_time - t_past)/1000); // convert to millis
+      voltageDistance = errorDisstance * Kp_D + Ki_D*I_D;
     }
 
     // error correction shouldn't go over max voltage and anti windup
     if (voltageDistance > maxVoltage) {
       voltageDistance = maxVoltage;
-      I = 0;
+      I_D = 0;
       // add anti windup properly here LATER
     }
 
