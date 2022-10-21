@@ -63,7 +63,7 @@ float shutOffDistance = 5;
 float Kp = 4;
 float Ki = 1.1;
 float I = 0.00;
-float windUpTolerance = PI;
+float windUpTolerance = PI/2.3;
 //Distance Contrrol Variables
 float Kp_D = 3.5;
 float Ki_D = 1.0;
@@ -124,13 +124,13 @@ void loop() {
 
 
   // assign the direction
-   if (errorLeft > 0){
+   if (errorLeft > 0) {
     digitalWrite(motorLDir, LOW);
   } else {
     digitalWrite(motorLDir, HIGH);
   }
 
-  if (errorRight > 0){
+  if (errorRight > 0) {
     digitalWrite(motorRDir, LOW);
   } else {
     digitalWrite(motorRDir, HIGH);
@@ -143,11 +143,13 @@ void loop() {
 
 //Controls for the left wheel 
  
-  if (errorLeft > shutOffError){
+  if (errorLeft > shutOffError) {
 
     //calculate the voltage you need to apply
-    if (errorLeft > windUpTolerance){
+    if (errorLeft > windUpTolerance) {
       voltageLeft = errorLeft * Kp;
+      I = 0;
+
     } else {
       I = I + errorLeft*((start_time - t_past)/1000); // convert to millis
       voltageLeft = errorLeft * Kp + Ki*I;
@@ -156,7 +158,7 @@ void loop() {
     // error correction shouldn't go over max voltage and anti windup
     if (voltageLeft > maxVoltage) {
       voltageLeft = maxVoltage;
-      I = 0;
+      //I = 0;
       // add anti windup properly here LATER
     }
 
@@ -165,18 +167,19 @@ void loop() {
 
     // Conditions that drive the motor
     analogWrite(motorLVolt, stepLeft);
-  } else{
+  } else {
     analogWrite(motorLVolt, 0);
   }
 
 
 //Controls for  the right wheel
 
-  if (errorRight > shutOffError){
+  if (errorRight > shutOffError) {
 
     //calculate the voltage you need to apply
-    if (errorRight > windUpTolerance){
+    if (errorRight > windUpTolerance) {
       voltageRight = errorRight * Kp;
+      I = 0;
     } else {
       I = I + errorRight*((start_time - t_past)/1000); // convert to millis
       voltageRight = errorRight * Kp + Ki*I;
@@ -185,7 +188,7 @@ void loop() {
     // error correction shouldn't go over max voltage and anti windup
     if (voltageRight > maxVoltage) {
       voltageRight = maxVoltage;
-      I = 0;
+      //I = 0;
       // add anti windup properly here LATER
     }
 
@@ -194,7 +197,7 @@ void loop() {
 
     // Conditions that drive the motor
     analogWrite(motorRVolt, stepRight);
-  } else{
+  } else {
     analogWrite(motorRVolt, 0);
   }
 
@@ -206,19 +209,19 @@ void loop() {
   while (millis() < start_time + period); // change this to if
 
 
-
-
+  /*
+  
   // This part will make the robot travel forward
   
   //First get the distance and ccalculate the error in distance
   errorDistance = goto_distance - distance;
 
   //Set direction of the two motors
-  if (errorDistance > 0 ){
+  if (errorDistance > 0 ) {
     digitalWrite(motorLDir, LOW);
     digitalWrite(motorRDir, HIGH);
 
-  } else{
+  } else {
     digitalWrite(motorLDir, HIGH);
     digitalWrite(motorRDir, LOW);
   }
@@ -226,16 +229,16 @@ void loop() {
   errorDistance = abs(errorDistance);
 
   //Control the robot to move
-  if (errorDistance >= shutOffDistance){
+  if (errorDistance >= shutOffDistance) {
    //Reset the position of each wheel to 0
     thetaLeft = 0;
     thetaRight = 0;
   
     //Controls calculates the Kp Ki and voltages 
-  if (errorDistance > shutOffDistance){
+  if (errorDistance > shutOffDistance) {
 
     //calculate the voltage you need to apply
-    if (errorDistance > windUpTolerance){
+    if (errorDistance > windUpTolerance) {
       voltageDistance = errorDistance * Kp;
     } else {
       I_D = I_D + errorDistance*((start_time - t_past)/1000); // convert to millis
@@ -263,10 +266,10 @@ void loop() {
     analogWrite(motorLVolt, 0);
     analogWrite(motorRVolt, 0);
   }
-
+  
 
   }
 
-
+  */
 
 }
