@@ -255,7 +255,10 @@ void loop() {
     // Conditions that drive the motor
     analogWrite(motorLVolt, stepDistance);
     analogWrite(motorRVolt, stepDistance);
+
+    //Calculate distance the robot has traveled
     distane = (r/2)*(thetaLeft + thtaRight);
+    
   } else{
     analogWrite(motorLVolt, 0);
     analogWrite(motorRVolt, 0);
