@@ -67,6 +67,14 @@ if __name__ == "__main__":
     print("rvecs: ", rvecs)
     print("tvecs: ", tvecs)
 
+    # print the types
+    print()
+    print("ret: ", type(ret))
+    print("mtx: ", type(mtx))
+    print("dist: ", type(dist))
+    print("rvecs: ", type(rvecs))
+    print("tvecs: ", type(tvecs))
+
     img = cv.imread('1.jpg')
     h,  w = img.shape[:2]
     newcameramtx, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
