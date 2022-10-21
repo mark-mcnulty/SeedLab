@@ -58,7 +58,7 @@ float maxVoltage = 7.7;
 
 float shutOffError = 0.05;
 float shutOffDistance = 5;
-float windUpTolerance = PI/2.3; // smaller anti windup for I
+float windUpTolerance = PI;
 float period = 10;
 float start_time;
 float t_past;
@@ -135,9 +135,8 @@ void loop() {
   if (errorLeft > shutOffError){
 
     //calculate the voltage you need to apply
-    if (errorLeft > windUpTolerance) {
+    if (errorLeft > windUpTolerance){
       voltageLeft = errorLeft * Kp;
-      I = 0; // anti-windup
     } else {
       I = I + errorLeft*((start_time - t_past)/1000); // convert to millis
       voltageLeft = errorLeft * Kp + Ki*I;
@@ -146,7 +145,7 @@ void loop() {
     // error correction shouldn't go over max voltage and anti windup
     if (voltageLeft > maxVoltage) {
       voltageLeft = maxVoltage;
-      //I = 0; removed
+      I = 0;
       // add anti windup properly here LATER
     }
 
@@ -167,7 +166,6 @@ void loop() {
     //calculate the voltage you need to apply
     if (errorRight > windUpTolerance){
       voltageRight = errorRight * Kp;
-      I = 0; // anti windup
     } else {
       I = I + errorRight*((start_time - t_past)/1000); // convert to millis
       voltageRight = errorRight * Kp + Ki*I;
@@ -176,7 +174,7 @@ void loop() {
     // error correction shouldn't go over max voltage and anti windup
     if (voltageRight > maxVoltage) {
       voltageRight = maxVoltage;
-      //I = 0; removed
+      I = 0;
       // add anti windup properly here LATER
     }
 
@@ -185,7 +183,7 @@ void loop() {
 
     // Conditions that drive the motor
     analogWrite(motorRVolt, stepRight);
-  } else {
+  } else{
     analogWrite(motorRVolt, 0);
   }
 
@@ -205,24 +203,52 @@ void loop() {
   errorDistance = goto_distance - distance;
 
   //Set direction of the two motors
-  if (errorDistance > 0 ) {
+  if (errorDistance > 0 ){
     digitalWrite(motorLDir, LOW);
     digitalWrite(motorRDir, HIGH);
 
-  } else {
+  } else{
     digitalWrite(motorLDir, HIGH);
     digitalWrite(motorRDir, LOW);
   }
 
+  errorDistance = abs(errorDistance);
+
   //Control the robot to move
-  if (errorDistance >= shutOffDistance) {
+  if (errorDistance >= shutOffDistance){
    //Reset the position of each wheel to 0
     thetaLeft = 0;
     thetaRight = 0;
   
-    //Controls calculates the Kp Ki and voltages
+    //Controls calculates the Kp Ki and voltages 
+  if (errorDistance > shutOffDistance){
 
-    
+    //calculate the voltage you need to apply
+    if (errorDistance > windUpTolerance){
+      voltageDistance = errorDistance * Kp;
+    } else {
+      I = I + errorDistance*((start_time - t_past)/1000); // convert to millis
+      voltageDistance = errorDisstance * Kp + Ki*I;
+    }
+
+    // error correction shouldn't go over max voltage and anti windup
+    if (voltageDistance > maxVoltage) {
+      voltageDistance = maxVoltage;
+      I = 0;
+      // add anti windup properly here LATER
+    }
+
+    // assign our steps 
+    stepDistance = abs(voltageDistance/maxVoltage) * 255;
+
+    // Conditions that drive the motor
+    analogWrite(motorLVolt, stepDistance);
+    analogWrite(motorRVolt, stepDistance);
+  } else{
+    analogWrite(motorLVolt, 0);
+    analogWrite(motorRVolt, 0);
+  }
+
 
   }
 
