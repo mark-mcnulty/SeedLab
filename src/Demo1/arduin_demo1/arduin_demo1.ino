@@ -255,6 +255,7 @@ void loop() {
     // Conditions that drive the motor
     analogWrite(motorLVolt, stepDistance);
     analogWrite(motorRVolt, stepDistance);
+    distane = (r/2)*(thetaLeft + thtaRight);
   } else{
     analogWrite(motorLVolt, 0);
     analogWrite(motorRVolt, 0);
