@@ -1,13 +1,8 @@
 # get the srcPythonClass folder avaliable
-import sys
-cur_path = sys.path[0]
-path_src_python = cur_path.replace("computer_vision\Demo1", "src\srcPythonClass")
-path_src_python = path_src_python.replace("\\","/")
-sys.path.append(path_src_python )
-
 #import the stuff
 # import camera
-import cv2
+import sys
+import cv2 as cv
 import numpy as np
 import glob 
 
@@ -24,64 +19,54 @@ import glob
 # https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
 
 if __name__ == "__main__":
-    # define the dimensions of checkerboard
+    # just a print so it doesn't give and error
+    print("hello world")
+
+    # define the size of the checkerboard
     CHECKERBOARD = (11,8)
 
-    # stop the iteration when specified accuracy, epsilon, is reached or
-    # specified number of iterations are completed.
-    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+    # determine the criteria for the calibration
+    criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
-    # vector for 3d points
-    threedpoints = []
+    # prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)
+    objp = np.zeros((6*7,3), np.float32)
+    objp[:,:2] = np.mgrid[0:7,0:6].T.reshape(-1,2)
 
-    # vector for 2d points
-    twodpoints = []
+    # Arrays to store object points and image points from all the images.
+    objpoints = [] # 3d point in real world space
+    imgpoints = [] # 2d points in image plane.
 
-    # 3d points real world coordinates
-    objectp3d = np.zeros((1, CHECKERBOARD[0] * CHECKERBOARD[1], 3), np.float32)
-    objectp3d[0, :, :2] = np.mgrid[0:CHECKERBOARD[0], 0:CHECKERBOARD[1]].T.reshape(-1, 2)
-    prev_img_shape = None
-
-    #extracting path of individual image stored in a given directory
     images = glob.glob('*.jpg')
 
-    for filename in images:
-        img = cv2.imread(filename)
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    for fname in images:
+        img = cv.imread(fname)
+        gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)
 
-        # find the chess board corners
-        ret, corners = cv2.findChessboardCorners(gray, CHECKERBOARD, CHECKERBOARD, None)
+        # Find the chess board corners
+        ret, corners = cv.findChessboardCorners(gray, (7,6),None)
 
         if ret == True:
-            threedpoints.append(objectp3d)
+            objpoints.append(objp)
 
-            # refining pixel coordinates for given 2d points.
-            corners2 = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
-
-            twodpoints.append(corners2)
+            corners2 = cv.cornerSubPix(gray,corners, (11,11), (-1,-1), criteria)
+            imgpoints.append(corners2)
 
             # Draw and display the corners
-            img = cv2.drawChessboardCorners(img, CHECKERBOARD, corners2, ret)
-        cv2.imshow('img', gray)
-        cv2.waitKey(0)
+            cv.drawChessboardCorners(img, (7,6), corners2, ret)
+            cv.imshow('img', img)
+            cv.waitKey(500)
 
-cv2.destroyAllWindows()
+    cv.destroyAllWindows()
 
-#performing camera calibration by
-#passing the value of known 3D points (threedpoints)
-#and corresponding pixel coordinates of the
-#detected corners (twodpoints)
-ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(threedpoints, twodpoints, gray.shape[::-1], None, None)
+    ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
 
-# Displaying required output
-print(" Camera matrix : ")
-print(mtx)
+    # print the parameters above 
+    print("ret: ", ret)
+    print("mtx: ", mtx)
+    print("dist: ", dist)
+    print("rvecs: ", rvecs)
+    print("tvecs: ", tvecs)
 
-print(" dist : ")
-print(dist)
-
-print(" rvecs : ")
-print(rvecs)
-
-print(" tvecs : ")
-print(tvecs)
+    img = cv.imread('1.jpg')
+    h,  w = img.shape[:2]
+    newcameramtx, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
