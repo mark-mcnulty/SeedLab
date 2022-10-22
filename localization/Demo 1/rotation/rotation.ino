@@ -80,8 +80,10 @@ void setup() {
 float errorSlave;
 float masterVoltage;
 
-float goto_theata;
+float goto_theta;
 float goto_angle = 270;
+float goto_theta_right;
+float goto_theta_left;
 
 float goto_distance = 200;
 float distance = 0.0;
@@ -103,7 +105,17 @@ void loop() {
   time_start = millis();
 
   // where we want to go
-  desiredTheta = 3.14;
+  goto_angle = 180;
+  goto_theta = calc_radians(goto_angle);
+
+  // choose direction
+  if (goto_angle > 0){
+    goto_theta_right = -2* goto_theta;
+    goto_theta_left = 2 * goto_theta;
+  } else {
+    goto_theta_right = 2* goto_theta;
+    goto_theta_left = -2 * goto_theta;    
+  }
   
   // calculate the current position of each motor
   thetaLeft= (2*PI* motorLeft.read()) / COUNTS_PER_ROTATION;
@@ -122,13 +134,13 @@ void loop() {
   
 
   // find the error
-  errorLeft = desiredTheta - thetaLeft;
+  errorLeft = goto_theta_left - thetaLeft;
   errorSlave = thetaLeft - thetaRight;
   
   // control master (left wheel)
   masterVoltage = drive_master(errorLeft, time_start, time_past);
 
-  // control slave (left wheel)
+  // control slave (right wheel)
   drive_slave(errorSlave, masterVoltage, time_start, time_past);
 
   //Calculate robot position and velocity using given quations
