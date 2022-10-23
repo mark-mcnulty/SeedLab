@@ -45,19 +45,17 @@ float stepDistance;
 float shutOffDistance = 5;
 
 // Controls variables
-float shutOffError = 0.05;
+float shutOffError = 0.01;
 float Kp = 3;
-float Ki = 1.1;
+float Ki = 1.1; // formerly 1.1
 float I = 0.00;
 
-float Kp_slave = 1;
-float Ki_slave = 1.0;
+float Kp_slave = 3;
+float Ki_slave = 1.1; // formerly 1.0
 float I_slave = 0.00;
 
-float windUpTolerance = PI;
-int MAX_PWM = 255;
-
-
+float windUpTolerance = PI/2.3;
+int MAX_PWM = 200;
 
 void setup() {
   Serial.begin(115200) ;
@@ -92,11 +90,13 @@ float period = 10;
 float time_start;
 float time_past;
 
-float r = 7.6;
+float r = 7.5;
+float AXIAL = 36.25;
+float r_a = AXIAL / 2;
 float u;
 
 // where we want to go
-float desiredTheta = -3.14/2;
+float desiredTheta = -PI/2;
 
 // void loop
 void loop() {
@@ -320,13 +320,15 @@ void drive_slave(float masterTheta, float slaveTheta, float desiredTheta, float 
 float turn_master(float masterTheta, float slaveTheta, float desiredTheta, float time_start, float time_past) {
   // define variables needed
   float voltage = 0;
+  float theta = (r_a * desiredTheta) / r; ;
   float error;
 
   // need to multiply the desired theta by 2 for turning
-  desiredTheta = 2 * desiredTheta;
+  // desiredTheta = ROTATIONAL_GAIN_VALUE * desiredTheta;
+
 
   // get the error
-  error = desiredTheta - masterTheta;
+  error = theta - masterTheta;
 
   // if the error is positive the motor should be going forward
   // if the error is negative the motor should be going backward 
@@ -385,6 +387,12 @@ void turn_slave(float masterTheta, float slaveTheta, float desiredTheta, float m
   error_right_turn = masterTheta - abs(slaveTheta);
   error_left_turn = abs(masterTheta) - slaveTheta;
 
+  // print both of the errors
+  // Serial.print(error_left_turn);
+  // Serial.print("\t");
+  // Serial.print(error_right_turn);
+  // Serial.println();
+
   // assign the direction it needs to turn
   // desiredTheta > 0 -> turn right -> have R LOW
   // desiredTheta < 0 -> turn left
@@ -403,7 +411,7 @@ void turn_slave(float masterTheta, float slaveTheta, float desiredTheta, float m
   }
 
   // dont want the error to be negative for the calculations
-  error = abs(masterTheta) - abs(slaveTheta);
+  error = abs(abs(masterTheta) - abs(slaveTheta));
 
   // see if its close enough to our desired location
   if (error < shutOffError){
