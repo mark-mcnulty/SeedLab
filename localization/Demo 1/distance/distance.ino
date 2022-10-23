@@ -96,7 +96,9 @@ float r = 7.6;
 float u;
 
 // where we want to go
+// float desiredDistance = 100;
 float desiredTheta = 3.14;
+// float desiredTheta = desiredDistance / r;
 
 // void loop
 void loop() {
@@ -308,7 +310,6 @@ void drive_slave(float masterTheta, float slaveTheta, float desiredTheta, float 
     analogWrite(motorRVolt, round(abs(voltage/maxVoltageSlave) * MAX_PWM));
   }
 }
-
 /*
   float turn_master(float masterTheta, float slaveTheta, float desiredTheta, float time_start, float time_past)
   PARAMTERS:
@@ -346,6 +347,7 @@ float turn_master(float masterTheta, float slaveTheta, float desiredTheta, float
     // deliver something
     // check for windup tolerance
     if (error > windUpTolerance){
+      I = 0;
       voltage = error * Kp;
     } else {
       // use integrator
@@ -385,9 +387,9 @@ void turn_slave(float masterTheta, float slaveTheta, float desiredTheta, float m
   // desiredTheta < 0 -> turn left
   if (desiredTheta > 0){
     if (error > 0){
-      digitalWrite(motorRDir, LOW);
-    } else {
       digitalWrite(motorRDir, HIGH);
+    } else {
+      digitalWrite(motorRDir, LOW);
     }
   } else {
     if (error > 0) {
@@ -406,6 +408,7 @@ void turn_slave(float masterTheta, float slaveTheta, float desiredTheta, float m
   } else {
     // check if wind up ie check to use integrator
     if (error > windUpTolerance){
+      I_slave = 0;
       voltage = error * Kp_slave;
     } else {
       // use integrator
@@ -422,10 +425,7 @@ void turn_slave(float masterTheta, float slaveTheta, float desiredTheta, float m
     }
 
     // drive the motor 
-    analogWrite(motorLVolt, round(abs(voltage/maxVoltage) * MAX_PWM));
+    analogWrite(motorRVolt, round(abs(voltage/maxVoltage) * MAX_PWM));
   }
 }
-
-
-
 

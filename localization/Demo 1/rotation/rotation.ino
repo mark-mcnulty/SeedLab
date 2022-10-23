@@ -96,7 +96,7 @@ float r = 7.6;
 float u;
 
 // where we want to go
-float desiredTheta = 3.14;
+float desiredTheta = -3.14/2;
 
 // void loop
 void loop() {
@@ -231,11 +231,11 @@ float drive_master(float masterTheta, float SlaveTheta, float desiredTheta, floa
     // shut the control off
     analogWrite(motorLVolt, 0);
   } else {
-    
     // implement the control to set the voltage of the motor
     // implement windUpTolerance
     if (error > windUpTolerance){
       // dont use the integrator
+      I = 0;
       voltage = error * Kp;
 
     } else {
@@ -289,6 +289,7 @@ void drive_slave(float masterTheta, float slaveTheta, float desiredTheta, float 
     // implement windUpTolerance
     if (error > windUpTolerance){
       // dont use the integrator
+      I_slave = 0;
       voltage = error * Kp_slave;
     } else {
       // use integrator
@@ -346,6 +347,7 @@ float turn_master(float masterTheta, float slaveTheta, float desiredTheta, float
     // deliver something
     // check for windup tolerance
     if (error > windUpTolerance){
+      I = 0;
       voltage = error * Kp;
     } else {
       // use integrator
@@ -374,23 +376,26 @@ float turn_master(float masterTheta, float slaveTheta, float desiredTheta, float
 */
 void turn_slave(float masterTheta, float slaveTheta, float desiredTheta, float masterVolt, float time_start, float time_past){
   // define variables needed
+  float error_right_turn;
+  float error_left_turn;
   float error;
   float voltage = 0;
 
   // calculate the error off the master
-  error = abs(masterTheta) - slaveTheta;
+  error_right_turn = masterTheta - abs(slaveTheta);
+  error_left_turn = abs(masterTheta) - slaveTheta;
 
   // assign the direction it needs to turn
   // desiredTheta > 0 -> turn right -> have R LOW
   // desiredTheta < 0 -> turn left
   if (desiredTheta > 0){
-    if (error > 0){
-      digitalWrite(motorRDir, HIGH);
-    } else {
+    if (error_right_turn > 0){
       digitalWrite(motorRDir, LOW);
+    } else {
+      digitalWrite(motorRDir, HIGH);
     }
   } else {
-    if (error > 0) {
+    if (error_left_turn > 0) {
       digitalWrite(motorRDir, HIGH);
     } else {
       digitalWrite(motorRDir, LOW);
@@ -398,7 +403,7 @@ void turn_slave(float masterTheta, float slaveTheta, float desiredTheta, float m
   }
 
   // dont want the error to be negative for the calculations
-  error = abs(error);
+  error = abs(masterTheta) - abs(slaveTheta);
 
   // see if its close enough to our desired location
   if (error < shutOffError){
@@ -406,6 +411,7 @@ void turn_slave(float masterTheta, float slaveTheta, float desiredTheta, float m
   } else {
     // check if wind up ie check to use integrator
     if (error > windUpTolerance){
+      I_slave = 0;
       voltage = error * Kp_slave;
     } else {
       // use integrator
