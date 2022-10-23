@@ -55,23 +55,8 @@ float Ki_slave = 1.1; // formerly 1.0
 float I_slave = 0.00;
 
 float windUpTolerance = PI/2.3;
-int MAX_PWM = 200;
+int MAX_PWM = 175;
 
-void setup() {
-  Serial.begin(115200) ;
-  // set the pins
-  pinMode(enable, OUTPUT);
-  pinMode(motorLDir, OUTPUT);
-  pinMode(motorRDir, OUTPUT);
-  pinMode(motorLVolt, OUTPUT);
-  pinMode(motorRVolt, OUTPUT);
-  pinMode(statusFlag, INPUT);
-
-
-  digitalWrite(enable, HIGH);
-  analogWrite(motorLVolt, 0);
-  analogWrite(motorRVolt, 0);
-}
 
 // variables
 float errorSlave;
@@ -91,12 +76,44 @@ float time_start;
 float time_past;
 
 float r = 7.5;
-float AXIAL = 36.25;
+float AXIAL = 36.5;
 float r_a = AXIAL / 2;
 float u;
 
+bool turnMasterComplete = false;
+bool turnSlaveComplete = false;
+
+bool driveMasterComplete = false;
+bool driveSlaveComplete = false;
+
+bool stateSwitchComplete = false;
+
+char control;
+
 // where we want to go
-float desiredTheta = -PI/2;
+float desiredDistance = 100;    // in cm
+float desiredDistanceTheta = desiredDistance / r;
+
+float desiredThetaTurn = -PI/2;
+
+void setup() {
+  Serial.begin(115200) ;
+  // set the pins
+  pinMode(enable, OUTPUT);
+  pinMode(motorLDir, OUTPUT);
+  pinMode(motorRDir, OUTPUT);
+  pinMode(motorLVolt, OUTPUT);
+  pinMode(motorRVolt, OUTPUT);
+  pinMode(statusFlag, INPUT);
+
+
+  digitalWrite(enable, HIGH);
+  analogWrite(motorLVolt, 0);
+  analogWrite(motorRVolt, 0);
+
+  // set the inital state to turning
+  control = 't';
+}
 
 // void loop
 void loop() {
@@ -109,28 +126,63 @@ void loop() {
   thetaRight= (2*PI* motorRight.read()) / COUNTS_PER_ROTATION;
 
   //Reading Right Encoder
-  Serial.print(motorLeft.read());
-  Serial.print(" ");
-  Serial.print(thetaLeft);
+//   Serial.print(motorLeft.read());
+//   Serial.print(" ");
+//   Serial.print(thetaLeft);
 
-  Serial.print("\t");
-  Serial.print(motorRight.read());
-  Serial.print(" ");
-  Serial.print(thetaRight);
-  Serial.println();
-  
-  // control master (left wheel)
-  masterVoltage = turn_master(thetaLeft, thetaRight, desiredTheta, time_start, time_past);
+//   Serial.print("\t");
+//   Serial.print(motorRight.read());
+//   Serial.print(" ");
+//   Serial.print(thetaRight);
+//   Serial.println();
 
-  // control slave (left wheel)
-  turn_slave(thetaLeft, thetaRight, desiredTheta, masterVoltage, time_start, time_past);
+  // check the state of the flags
+  if (turnMasterComplete && turnSlaveComplete && !(stateSwitchComplete)) {
+    motorRight.write(0);
+    motorLeft.write(0);
+    control = 'd';
+    stateSwitchComplete = true;
+  } else if (driveMasterComplete && driveSlaveComplete){
+    control = 'z';
+  }
+
+  // see what control to do
+  switch (control){
+    case 'd':
+        // control master (left wheel)
+        masterVoltage = 0;
+        masterVoltage = drive_master(thetaLeft, thetaRight, desiredDistanceTheta, time_start, time_past);
+
+        // control slave (left wheel)
+        drive_slave(thetaLeft, thetaRight, desiredDistanceTheta, masterVoltage, time_start, time_past);
+
+        Serial.println("drive");
+
+        break;
+
+    case 't':
+        // control master (left)
+        masterVoltage = 0;
+        masterVoltage = turn_master(thetaLeft, thetaRight, desiredThetaTurn, time_start, time_past);
+
+        // control slave (left wheel)
+        turn_slave(thetaLeft, thetaRight, desiredThetaTurn, masterVoltage, time_start, time_past);
+
+        Serial.println("turn");
+
+        break;
+
+    default:
+
+        Serial.println("done");
+        break;
+  }
 
   //Calculate robot position and velocity using given quations
   time_past = time_start;
   
   // this will add a delay between operations
   while (millis() < time_start + period); // change this to if
-
 }
 
 /*
@@ -228,9 +280,15 @@ float drive_master(float masterTheta, float SlaveTheta, float desiredTheta, floa
 
   // only drive the motor if the error is greater then the shutofferror
   if(error < shutOffError){
+    // set flag
+    driveMasterComplete = true;
+
     // shut the control off
     analogWrite(motorLVolt, 0);
   } else {
+    // set flag
+    driveMasterComplete = false;
+
     // implement the control to set the voltage of the motor
     // implement windUpTolerance
     if (error > windUpTolerance){
@@ -282,9 +340,13 @@ void drive_slave(float masterTheta, float slaveTheta, float desiredTheta, float 
 
   // only drive the motor if the error is greater then the shutofferror
   if(error < shutOffError){
+    // set flag
+    driveSlaveComplete = true;
+    
     // shut the control off
     analogWrite(motorRVolt, 0);
   } else {
+
     // implement the control to set the voltage of the motor
     // implement windUpTolerance
     if (error > windUpTolerance){
@@ -342,9 +404,15 @@ float turn_master(float masterTheta, float slaveTheta, float desiredTheta, float
 
   // see if were close enough to the target to shut off control
   if (error < shutOffError){
+    // set flag
+    turnMasterComplete = true;
+
     // dont deliver anything
     analogWrite(motorLVolt, 0);
   } else {
+    // set flag
+    turnMasterComplete = false;
+
     // deliver something
     // check for windup tolerance
     if (error > windUpTolerance){
@@ -414,8 +482,12 @@ void turn_slave(float masterTheta, float slaveTheta, float desiredTheta, float m
 
   // see if its close enough to our desired location
   if (error < shutOffError){
+    // set flag
+    turnSlaveComplete= true;
+
     analogWrite(motorRVolt, 0);
   } else {
+
     // check if wind up ie check to use integrator
     if (error > windUpTolerance){
       I_slave = 0;
