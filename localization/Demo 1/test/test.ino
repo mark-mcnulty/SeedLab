@@ -10,8 +10,8 @@
 // define the pins
 //HELLO WORLSD
 // DualMC33926MotorShield md;
-#define ENCL1_LEFT 2
-#define ENCL2_LEFT 5
+#define ENCL1_LEFT 5
+#define ENCL2_LEFT 2
 #define ENCR1_RIGHT 3
 #define ENCR2_RIGHT 6
 Encoder motorRight (ENCR1_RIGHT, ENCR2_RIGHT);

@@ -34,7 +34,6 @@ int stepLeft;
 
 //Right Wheel Variable
 float thetaRight = 0.0;
-float desiredTheta;
 float errorRight;
 float voltageRight;
 int stepRight;
@@ -51,7 +50,7 @@ float Kp = 4;
 float Ki = 1.1;
 float I = 0.00;
 
-float Kp_slave = 4;
+float Kp_slave = 1;
 float Ki_slave = 1.0;
 float I_slave = 0.00;
 
@@ -96,14 +95,14 @@ float time_past;
 float r = 7.6;
 float u;
 
+// where we want to go
+float desiredTheta = 3.14;
+
 // void loop
 void loop() {
   //Read time at the start of loop for controls
   // read the start time
   time_start = millis();
-
-  // where we want to go
-  desiredTheta = 3.14;
   
   // calculate the current position of each motor
   thetaLeft= (2*PI* motorLeft.read()) / COUNTS_PER_ROTATION;
@@ -120,16 +119,11 @@ void loop() {
   Serial.print(thetaRight);
   Serial.println();
   
-
-  // find the error
-  errorLeft = desiredTheta - thetaLeft;
-  errorSlave = thetaLeft - thetaRight;
-  
   // control master (left wheel)
-  masterVoltage = drive_master(errorLeft, time_start, time_past);
+  masterVoltage = drive_master(thetaLeft, thetaRight, desiredTheta, time_start, time_past);
 
   // control slave (left wheel)
-  drive_slave(errorSlave, masterVoltage, time_start, time_past);
+  drive_slave(thetaLeft, thetaRight, desiredTheta, masterVoltage, time_start, time_past);
 
   //Calculate robot position and velocity using given quations
   time_past = time_start;
@@ -138,7 +132,6 @@ void loop() {
   while (millis() < time_start + period); // change this to if
 
 }
-
 
 /*
   calc_degrees
@@ -149,7 +142,6 @@ void loop() {
 float calc_degrees(float rad){
   return (rad * 180) / PI;
 }
-
 
 /*
 
@@ -216,9 +208,13 @@ void drive_backward(){
   RETURN: 
   FUNCTIONALITY: this will set the voltage on the Left wheel based on the error
 */
-float drive_master(float error, float time_start, float time_past){
+float drive_master(float masterTheta, float SlaveTheta, float desiredTheta, float time_start, float time_past){
   // define variables
   float voltage = 0;
+  float error;
+
+  // find error 
+  error = desiredTheta - masterTheta;
 
   // assign the direction based on error sign
   if (error > 0) {
@@ -253,7 +249,7 @@ float drive_master(float error, float time_start, float time_past){
       voltage = maxVoltage;
     }
     // assign the voltage value to the motor
-    analogWrite(motorLVolt, round(abs(voltage/maxVoltageSlave) * MAX_PWM));
+    analogWrite(motorLVolt, round(abs(voltage/maxVoltage) * MAX_PWM));
   }
 
   // return the voltage for the slave 
@@ -266,9 +262,13 @@ float drive_master(float error, float time_start, float time_past){
   RETURN:
   FUNCTIONALITY: this will set the voltage on the right wheel based on the error
 */
-void drive_slave(float error, float masterVoltage, float time_start, float time_past){
+void drive_slave(float masterTheta, float slaveTheta, float desiredTheta, float masterVoltage, float time_start, float time_past){
   // define variables
-  float voltage;
+  float voltage = 0;
+  float error;
+
+  // assign error
+  error = masterTheta - slaveTheta;
 
   // assign the direction based on error sign
   if (error > 0) {
@@ -281,7 +281,7 @@ void drive_slave(float error, float masterVoltage, float time_start, float time_
   error = abs(error);
 
   // only drive the motor if the error is greater then the shutofferror
-  if(masterVoltage == 0 && error < shutOffError){
+  if(error < shutOffError){
     // shut the control off
     analogWrite(motorRVolt, 0);
   } else {
@@ -289,12 +289,11 @@ void drive_slave(float error, float masterVoltage, float time_start, float time_
     // implement windUpTolerance
     if (error > windUpTolerance){
       // dont use the integrator
-      voltage = error * Kp;
-
+      voltage = error * Kp_slave;
     } else {
       // use integrator
-      I = I + error * ((time_start - time_past)/1000);
-      voltage = (error * Kp) + (Ki * I);
+      I_slave = I_slave + error * ((time_start - time_past)/1000);
+      voltage = (error * Kp_slave) + (Ki_slave * I_slave);
     }
 
     // add in the masters voltage
@@ -306,9 +305,127 @@ void drive_slave(float error, float masterVoltage, float time_start, float time_
     }
 
     // assign the voltage value to the motor
-    analogWrite(motorRVolt, (abs(voltage/maxVoltageSlave) * MAX_PWM));
+    analogWrite(motorRVolt, round(abs(voltage/maxVoltageSlave) * MAX_PWM));
   }
 }
+
+/*
+  float turn_master(float masterTheta, float slaveTheta, float desiredTheta, float time_start, float time_past)
+  PARAMTERS:
+  RETURN: float masterVolt
+  FUNCTIONALITY:
+*/
+
+float turn_master(float masterTheta, float slaveTheta, float desiredTheta, float time_start, float time_past) {
+  // define variables needed
+  float voltage = 0;
+  float error;
+
+  // need to multiply the desired theta by 2 for turning
+  desiredTheta = 2 * desiredTheta;
+
+  // get the error
+  error = desiredTheta - masterTheta;
+
+  // if the error is positive the motor should be going forward
+  // if the error is negative the motor should be going backward 
+  if (error > 0){
+    digitalWrite(motorLDir, HIGH);
+  } else {
+    digitalWrite(motorLDir, LOW);
+  }
+
+  // we don't want a negative error for our calculations
+  error = abs(error);
+
+  // see if were close enough to the target to shut off control
+  if (error < shutOffError){
+    // dont deliver anything
+    analogWrite(motorLVolt, 0);
+  } else {
+    // deliver something
+    // check for windup tolerance
+    if (error > windUpTolerance){
+      voltage = error * Kp;
+    } else {
+      // use integrator
+      I = I + error * ((time_start - time_past)/1000);
+      voltage = (error * Kp) + (Ki * I);
+    }
+
+    // check if the voltage is too high
+    if (voltage > maxVoltage){
+      voltage = maxVoltage;
+    }
+
+    // deliver power to the motor
+    analogWrite(motorLVolt, round(abs(voltage/maxVoltage) * MAX_PWM));
+  }
+
+  // return the masters voltage
+  return voltage;
+}
+
+/*
+  void turn_slave(float masterTheta, float slaveThetat, float desiredTheta, float masterVolt, float time_start, float time_past)
+  PARAMETERS:
+  RETURN:
+  FUNCTIONALITY:
+*/
+void turn_slave(float masterTheta, float slaveTheta, float desiredTheta, float masterVolt, float time_start, float time_past){
+  // define variables needed
+  float error;
+  float voltage = 0;
+
+  // calculate the error off the master
+  error = abs(masterTheta) - slaveTheta;
+
+  // assign the direction it needs to turn
+  // desiredTheta > 0 -> turn right -> have R LOW
+  // desiredTheta < 0 -> turn left
+  if (desiredTheta > 0){
+    if (error > 0){
+      digitalWrite(motorRDir, LOW);
+    } else {
+      digitalWrite(motorRDir, HIGH);
+    }
+  } else {
+    if (error > 0) {
+      digitalWrite(motorRDir, HIGH);
+    } else {
+      digitalWrite(motorRDir, LOW);
+    }
+  }
+
+  // dont want the error to be negative for the calculations
+  error = abs(error);
+
+  // see if its close enough to our desired location
+  if (error < shutOffError){
+    analogWrite(motorRVolt, 0);
+  } else {
+    // check if wind up ie check to use integrator
+    if (error > windUpTolerance){
+      voltage = error * Kp_slave;
+    } else {
+      // use integrator
+      I_slave = I_slave + error * ((time_start - time_past)/1000);
+      voltage = (error * Kp_slave) + (Ki_slave * I_slave);
+    }
+    
+    // add the voltage to the masterVolt
+    voltage = voltage + masterVolt;
+
+    // check if the voltage is too high
+    if (voltage > maxVoltage){
+      voltage = maxVoltage;
+    }
+
+    // drive the motor 
+    analogWrite(motorLVolt, round(abs(voltage/maxVoltage) * MAX_PWM));
+  }
+}
+
 
 
 
