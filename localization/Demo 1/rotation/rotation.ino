@@ -10,8 +10,8 @@
 // define the pins
 //HELLO WORLSD
 DualMC33926MotorShield md;
-#define ENCL1_LEFT 5
-#define ENCL2_LEFT 2
+#define ENCL1_LEFT 2
+#define ENCL2_LEFT 5
 #define ENCR1_RIGHT 3
 #define ENCR2_RIGHT 6
 Encoder motorRight (ENCR1_RIGHT, ENCR2_RIGHT);
@@ -46,7 +46,7 @@ float shutOffDistance = 5;
 
 // Controls variables
 float shutOffError = 0.05;
-float Kp = 4;
+float Kp = 3;
 float Ki = 1.1;
 float I = 0.00;
 
@@ -385,9 +385,9 @@ void turn_slave(float masterTheta, float slaveTheta, float desiredTheta, float m
   // desiredTheta < 0 -> turn left
   if (desiredTheta > 0){
     if (error > 0){
-      digitalWrite(motorRDir, LOW);
-    } else {
       digitalWrite(motorRDir, HIGH);
+    } else {
+      digitalWrite(motorRDir, LOW);
     }
   } else {
     if (error > 0) {
@@ -422,7 +422,7 @@ void turn_slave(float masterTheta, float slaveTheta, float desiredTheta, float m
     }
 
     // drive the motor 
-    analogWrite(motorLVolt, round(abs(voltage/maxVoltage) * MAX_PWM));
+    analogWrite(motorRVolt, round(abs(voltage/maxVoltage) * MAX_PWM));
   }
 }
 
