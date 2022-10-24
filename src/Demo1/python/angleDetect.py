@@ -19,7 +19,7 @@ if __name__ == '__main__':
     oldAngle = 0
 
     # Initialize the camera
-    cam = arducam.Arducam()
+    cam = arducam()
 
     try: 
         while True:
