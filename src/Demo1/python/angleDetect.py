@@ -15,6 +15,7 @@ if __name__ == '__main__':
     # initialize variables
     i2c = busio.I2C(board.SCL, board.SDA)
     lcd = character_lcd.Character_LCD_RGB_I2C(i2c, lcd_columns, lcd_rows)
+    lcd.color = [0, 100, 0]
     oldAngle = 0
 
     # Initialize the camera
@@ -34,7 +35,6 @@ if __name__ == '__main__':
                 # if the angle is different than the last angle
                 if angle != oldAngle:
                     # Set LCD color to blue
-                    lcd.color = [0, 100, 0]
                     lcd.clear()
                     lcd.message = "Angle:\n" + str(angle)
                     time.sleep(1)
