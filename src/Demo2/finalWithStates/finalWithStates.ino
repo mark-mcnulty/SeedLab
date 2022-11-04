@@ -27,7 +27,7 @@ int statusFlag = 12;
 
 // robot viarbales
 float r = 7.5;
-float AXIAL = 36.5;
+float AXIAL = 36.5;            //36.5
 float r_a = AXIAL / 2;
 float u;
 
@@ -36,15 +36,15 @@ float shutOffDistance = 5;
 
 // Controls variables
 float shutOffError = 0.01;
-float Kp = 3;
-float Ki = 1.5; // formerly 1.1
+float Kp = 3.0; // best 2.9
+float Ki = 3.0; // best 3.0
 float I = 0.00;
 
-float Kp_slave = 3;
-float Ki_slave = 1.3; // formerly 1.0
+float Kp_slave = 2.5; //best 2.7
+float Ki_slave = 1.1; // formerly 1.1
 float I_slave = 0.00;
 
-float windUpTolerance = PI/2.3;
+float windUpTolerance = PI/2;         //PI/2.3
 int MAX_PWM = 175;
 
 float maxVoltage = 7;
@@ -161,7 +161,6 @@ void loop() {
         default:
             break;
     }
-
 
     // datapath
     switch (state) {
