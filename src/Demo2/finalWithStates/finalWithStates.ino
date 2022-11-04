@@ -3,12 +3,12 @@
 #include <Wire.h>
 #include <Encoder.h>
 
+
 #define ENCODER_OPTIMIZE_INTERRUPTS
 #define COUNTS_PER_ROTATION 3200
 #define SLAVE_ADDRESS 0x04
 
 // define the pins
-//HELLO WORLSD
 DualMC33926MotorShield md;
 #define ENCL1_LEFT 2
 #define ENCL2_LEFT 5
@@ -37,7 +37,7 @@ float shutOffDistance = 5;
 // Controls variables
 float shutOffError = 0.01;
 float Kp = 3;
-float Ki = 1.1; // formerly 1.1
+float Ki = 1.5; // formerly 1.1
 float I = 0.00;
 
 float Kp_slave = 3;
@@ -67,7 +67,7 @@ typedef enum {
 states state = start;
 
 // flags for states
-bool markerFound = false;
+bool markerFound = true;
 bool turnDone = false;
 bool driveDone = false;
 float driveDoneTime = 0;
@@ -76,9 +76,9 @@ float deltaDone = 500;  // time in ms
 float currentTime = 0;
 
 // data from pi about marker
-float markerAngle = 0;
-float noMarkerAngle = 0.15;       -- rads
-float markerDistance = 0;
+float markerAngle = PI/2;
+float noMarkerAngle = 0.15;       // rads
+float markerDistance = 100;
 float markerDistanceTheta = markerDistance / r;
 
 
@@ -202,11 +202,11 @@ void receivePiData(){
 /* 
 TURN STATE
 */
-void turn(float desiredthetaTurn, float time_start, float time_past) {
+void turn(float desiredThetaTurn, float time_start, float time_past) {
   // set varaibles
   float masterVoltage = 0;
-  thetaLeft= (2*PI* motorLeft.read()) / COUNTS_PER_ROTATION;
-  thetaRight= (2*PI* motorRight.read()) / COUNTS_PER_ROTATION;
+  float thetaLeft= (2*PI* motorLeft.read()) / COUNTS_PER_ROTATION;
+  float thetaRight= (2*PI* motorRight.read()) / COUNTS_PER_ROTATION;
 
   // turn
   masterVoltage = turn_master(thetaLeft, thetaRight, desiredThetaTurn, time_start, time_past);
@@ -216,15 +216,15 @@ void turn(float desiredthetaTurn, float time_start, float time_past) {
 /*
 DRIVE STATE
 */
-void drive() {
+void drive(float desiredTheta, float time_start, float time_past) {
   // set variables
   float masterVoltage = 0;
-  thetaLeft= (2*PI* motorLeft.read()) / COUNTS_PER_ROTATION;
-  thetaRight= (2*PI* motorRight.read()) / COUNTS_PER_ROTATION;
+  float thetaLeft= (2*PI* motorLeft.read()) / COUNTS_PER_ROTATION;
+  float thetaRight= (2*PI* motorRight.read()) / COUNTS_PER_ROTATION;
 
   // drive
-  masterVoltage = drive_master(thetaLeft, thetaRight, time_start, time_past);
-  drive_slave(thetaLeft, thetaRight, masterVoltage, time_start, time_past);
+  masterVoltage = drive_master(thetaLeft, thetaRight, desiredTheta, time_start, time_past);
+  drive_slave(thetaLeft, thetaRight, desiredTheta, masterVoltage, time_start, time_past);
 
 }
 
