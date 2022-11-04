@@ -25,23 +25,7 @@ int motorLDir = 7;
 int motorRDir = 8;
 int statusFlag = 12;
 
-//Left Wheel Variables
-float thetaLeft = 0.0;
-float desiredThetaLeft;
-float errorLeft;
-float voltageLeft;
-int stepLeft;
-
-//Right Wheel Variable
-float thetaRight = 0.0;
-float errorRight;
-float voltageRight;
-int stepRight;
-
 //Distance Variable
-float errorDistance;
-float voltageDistance;
-float stepDistance;
 float shutOffDistance = 5;
 
 // Controls variables
@@ -57,17 +41,6 @@ float I_slave = 0.00;
 float windUpTolerance = PI/2.3;
 int MAX_PWM = 175;
 
-
-// variables
-float errorSlave;
-float masterVoltage;
-
-float goto_theata;
-float goto_angle = 270;
-
-float goto_distance = 200;
-float distance = 0.0;
-
 float maxVoltage = 7;
 float maxVoltageSlave = 7.3;
 
@@ -80,21 +53,33 @@ float AXIAL = 36.5;
 float r_a = AXIAL / 2;
 float u;
 
-bool turnMasterComplete = false;
-bool turnSlaveComplete = false;
 
-bool driveMasterComplete = false;
-bool driveSlaveComplete = false;
+// state variables
+typedef enum {
+    start,
+    is_marker_found,
+    turn_to_marker,
+    drive_to_marker,
+    turn_to_find,
+    stop
+    } states;
+states state = start;
 
-bool stateSwitchComplete = false;
+// flags for states
+bool markerFound = false;
+bool turnDone = false;
+bool driveDone = false;
+float driveDoneTime = 0;
+float turnDoneTime = 0;
+float deltaDone = 500;  // time in ms
+float currentTime = 0;
 
-char control;
+// data from pi about marker
+float markerAngle = 0;
+float markerDistance = 0;
+float markerDistanceTheta = markerDistance / r;
 
-// where we want to go
-float desiredDistance = 100;    // in cm
-float desiredDistanceTheta = desiredDistance / r;
 
-float desiredThetaTurn = -PI/2;
 
 void setup() {
   Serial.begin(115200) ;
@@ -115,140 +100,113 @@ void setup() {
   control = 't';
 }
 
-// void loop
+
+
 void loop() {
-  //Read time at the start of loop for controls
-  // read the start time
-  time_start = millis();
-  
-  // calculate the current position of each motor
-  thetaLeft= (2*PI* motorLeft.read()) / COUNTS_PER_ROTATION;
-  thetaRight= (2*PI* motorRight.read()) / COUNTS_PER_ROTATION;
+    // define the time_start
+    time_start = millis();
 
-  //Reading Right Encoder
-//   Serial.print(motorLeft.read());
-//   Serial.print(" ");
-//   Serial.print(thetaLeft);
 
-//   Serial.print("\t");
-//   Serial.print(motorRight.read());
-//   Serial.print(" ");
-//   Serial.print(thetaRight);
-//   Serial.println();
+    // control unit
+    switch (state) {
+        case start:
+            state = is_marker_found;
+            break;
+        case is_marker_found:
+            if (markerFound) {
+                state = turn_to_marker;
+            } else {
+                state = turn_to_find;
+            }
+            break;
+        case turn_to_find:
+            if (turnDone) {
+                state = is_marker_found;
+            } else {
+                state = turn_to_find;
+            }
+            break;
+        case turn_to_marker:
+            if (turnDone) {
+                state = drive_to_marker;
+            } else {
+                state = turn_to_marker;
+            }
+            break;
+        case drive_to_marker:
+            if (driveDone) {
+                state = is_marker_found;
+            } else {
+                state = drive_to_marker;
+            }
+            break;
+        case stop:
+            break;
+        default:
+            break;
+    }
 
-  // check the state of the flags
-  if (turnMasterComplete && turnSlaveComplete && !(stateSwitchComplete)) {
-    motorRight.write(0);
-    motorLeft.write(0);
-    control = 'd';
-    stateSwitchComplete = true;
-  } else if (driveMasterComplete && driveSlaveComplete){
-    control = 'z';
-  }
 
-  // see what control to do
-  switch (control){
-    case 'd':
-        // control master (left wheel)
-        masterVoltage = 0;
-        masterVoltage = drive_master(thetaLeft, thetaRight, desiredDistanceTheta, time_start, time_past);
+    // datapath
+    switch (state) {
+        case start:
+            break;
+        case is_marker_found:
+            break;
+        case turn_to_find:
+            turn(0.5, time_start, time_past);
+            break;
+        case turn_to_marker:
+            turn()
+            break;
+        case drive_to_marker:
+            driveToMarker();
+            break;
+        case stop:
+            break;
+        default:
+            break;
+    }
 
-        // control slave (left wheel)
-        drive_slave(thetaLeft, thetaRight, desiredDistanceTheta, masterVoltage, time_start, time_past);
 
-        Serial.println("drive");
-
-        break;
-
-    case 't':
-        // control master (left)
-        masterVoltage = 0;
-        masterVoltage = turn_master(thetaLeft, thetaRight, desiredThetaTurn, time_start, time_past);
-
-        // control slave (left wheel)
-        turn_slave(thetaLeft, thetaRight, desiredThetaTurn, masterVoltage, time_start, time_past);
-
-        Serial.println("turn");
-
-        break;
-
-    default:
-
-        Serial.println("done");
-        break;
-  }
-
-  //Calculate robot position and velocity using given quations
+    //Calculate robot position and velocity using given quations
   time_past = time_start;
   
   // this will add a delay between operations
   while (millis() < time_start + period); // change this to if
 }
-
-/*
-  calc_degrees
-  PARAMETERS: float
-  RETURN: float
-  FUNCTIONALITY: This function will return the degrees of a radian
+/* 
+DATA FROM PI
 */
-float calc_degrees(float rad){
-  return (rad * 180) / PI;
+void receivePiData(){
+    // read the data line
+
+    // tell that the marker is found
+    markerFound = true;
+}
+
+/* 
+TURN STATE
+*/
+void turn(float desiredthetaTurn, float time_start, float time_past) {
+    float masterVoltage = 0;
+
+    // get the current position
+    thetaLeft= (2*PI* motorLeft.read()) / COUNTS_PER_ROTATION;
+    thetaRight= (2*PI* motorRight.read()) / COUNTS_PER_ROTATION;
+
+
+    masterVoltage = turn_master(thetaLeft, thetaRight, desiredThetaTurn, time_start, time_past);
+
+    // control slave (left wheel)
+    turn_slave(thetaLeft, thetaRight, desiredThetaTurn, masterVoltage, time_start, time_past);
 }
 
 /*
-
-  calc_radians
-  PARAMETERS: float
-  RETURN: float
-  FUNCTIONALITY: This function will calculate the degrees and return it
-
+DRIVE STATE
 */
-float calc_radians(float deg) {
-  return (deg * PI) / 180; 
-}
+void drive() {
 
-/*
-  drive_right()
-  PARAMETERS: None
-  RETURN: None
-  FUNCTIONALITY: This will set the controls to drive right
-*/
-void drive_right(){
-  digitalWrite(motorLDir, HIGH);
-  digitalWrite(motorRDir, LOW);
-}
-
-/*
-  drive_left()
-  PARAMETERS: None
-  RETURN: None
-  FUNCTIONALITY: This will set the controls to drive left
-*/
-void drive_left(){
-  digitalWrite(motorLDir, LOW);
-  digitalWrite(motorRDir, HIGH);
-}
-
-/*
-  drive_forward()
-  PARAMETERS: None
-  RETURN: None
-  FUNCTIONALITY: This will set the controls to drive forward
-*/
-void drive_forward(){
-  digitalWrite(motorLDir, HIGH);
-  digitalWrite(motorRDir, HIGH);
-}
-
-/*
-  drive_right()
-  PARAMETERS: None
-  RETURN: None
-  FUNCTIONALITY: This will set the controls to drive backward
-*/
-void drive_backward(){
-  digitalWrite(motorLDir, LOW);
-  digitalWrite(motorRDir, LOW);
 }
 
 /* 
@@ -287,7 +245,6 @@ float drive_master(float masterTheta, float SlaveTheta, float desiredTheta, floa
     analogWrite(motorLVolt, 0);
   } else {
     // set flag
-    driveMasterComplete = false;
 
     // implement the control to set the voltage of the motor
     // implement windUpTolerance
@@ -372,6 +329,7 @@ void drive_slave(float masterTheta, float slaveTheta, float desiredTheta, float 
   }
 }
 
+
 /*
   float turn_master(float masterTheta, float slaveTheta, float desiredTheta, float time_start, float time_past)
   PARAMTERS:
@@ -404,14 +362,19 @@ float turn_master(float masterTheta, float slaveTheta, float desiredTheta, float
 
   // see if were close enough to the target to shut off control
   if (error < shutOffError){
-    // set flag
-    turnMasterComplete = true;
-
+    // assign the current time
+    currentTime = millis();
+    if (currentTime > turnDoneTime + deltaDone) {
+      // set flag
+      turnDone = true;
+    }
     // dont deliver anything
     analogWrite(motorLVolt, 0);
+
+    
   } else {
     // set flag
-    turnMasterComplete = false;
+    turnDone = false;
 
     // deliver something
     // check for windup tolerance
@@ -431,6 +394,9 @@ float turn_master(float masterTheta, float slaveTheta, float desiredTheta, float
 
     // deliver power to the motor
     analogWrite(motorLVolt, round(abs(voltage/maxVoltage) * MAX_PWM));
+
+    // assign time
+    turnDoneTime = millis();
   }
 
   // return the masters voltage
