@@ -25,6 +25,12 @@ int motorLDir = 7;
 int motorRDir = 8;
 int statusFlag = 12;
 
+// robot viarbales
+float r = 7.5;
+float AXIAL = 36.5;
+float r_a = AXIAL / 2;
+float u;
+
 //Distance Variable
 float shutOffDistance = 5;
 
@@ -47,11 +53,6 @@ float maxVoltageSlave = 7.3;
 float period = 10;
 float time_start;
 float time_past;
-
-float r = 7.5;
-float AXIAL = 36.5;
-float r_a = AXIAL / 2;
-float u;
 
 
 // state variables
@@ -76,6 +77,7 @@ float currentTime = 0;
 
 // data from pi about marker
 float markerAngle = 0;
+float noMarkerAngle = 0.15;       -- rads
 float markerDistance = 0;
 float markerDistanceTheta = markerDistance / r;
 
@@ -95,9 +97,6 @@ void setup() {
   digitalWrite(enable, HIGH);
   analogWrite(motorLVolt, 0);
   analogWrite(motorRVolt, 0);
-
-  // set the inital state to turning
-  control = 't';
 }
 
 
@@ -136,6 +135,10 @@ void loop() {
         case drive_to_marker:
             if (driveDone) {
                 state = is_marker_found;
+                
+                // reset the marker found flag
+                markerFound = false;
+
             } else {
                 state = drive_to_marker;
             }
@@ -149,19 +152,30 @@ void loop() {
 
     // datapath
     switch (state) {
+        // start
         case start:
             break;
+
+        // if the marker is found
         case is_marker_found:
             break;
+
+        // turn to find the marker
         case turn_to_find:
-            turn(0.5, time_start, time_past);
+            turn(noMarkerAngle, time_start, time_past);
             break;
+
+        // turn to the marker if the marker is found
         case turn_to_marker:
-            turn()
+            turn(markerAngle, time_start, time_past);
             break;
+
+        // drive to the marker if the marker is found
         case drive_to_marker:
-            driveToMarker();
+            drive(markerDistanceTheta, time_start, time_past);
             break;
+
+        // stop
         case stop:
             break;
         default:
@@ -189,23 +203,28 @@ void receivePiData(){
 TURN STATE
 */
 void turn(float desiredthetaTurn, float time_start, float time_past) {
-    float masterVoltage = 0;
+  // set varaibles
+  float masterVoltage = 0;
+  thetaLeft= (2*PI* motorLeft.read()) / COUNTS_PER_ROTATION;
+  thetaRight= (2*PI* motorRight.read()) / COUNTS_PER_ROTATION;
 
-    // get the current position
-    thetaLeft= (2*PI* motorLeft.read()) / COUNTS_PER_ROTATION;
-    thetaRight= (2*PI* motorRight.read()) / COUNTS_PER_ROTATION;
-
-
-    masterVoltage = turn_master(thetaLeft, thetaRight, desiredThetaTurn, time_start, time_past);
-
-    // control slave (left wheel)
-    turn_slave(thetaLeft, thetaRight, desiredThetaTurn, masterVoltage, time_start, time_past);
+  // turn
+  masterVoltage = turn_master(thetaLeft, thetaRight, desiredThetaTurn, time_start, time_past);
+  turn_slave(thetaLeft, thetaRight, desiredThetaTurn, masterVoltage, time_start, time_past);
 }
 
 /*
 DRIVE STATE
 */
 void drive() {
+  // set variables
+  float masterVoltage = 0;
+  thetaLeft= (2*PI* motorLeft.read()) / COUNTS_PER_ROTATION;
+  thetaRight= (2*PI* motorRight.read()) / COUNTS_PER_ROTATION;
+
+  // drive
+  masterVoltage = drive_master(thetaLeft, thetaRight, time_start, time_past);
+  drive_slave(thetaLeft, thetaRight, masterVoltage, time_start, time_past);
 
 }
 
@@ -238,13 +257,21 @@ float drive_master(float masterTheta, float SlaveTheta, float desiredTheta, floa
 
   // only drive the motor if the error is greater then the shutofferror
   if(error < shutOffError){
-    // set flag
-    driveMasterComplete = true;
+    // assign current time
+    currentTime = millis();
+
+    // check if the time is greater then the delta time
+    if (currentTime - driveDoneTime > deltaDone) {
+      // set the drive done flag
+      driveDone = true;
+    }
 
     // shut the control off
     analogWrite(motorLVolt, 0);
+
   } else {
     // set flag
+    driveDone = false;
 
     // implement the control to set the voltage of the motor
     // implement windUpTolerance
@@ -265,7 +292,9 @@ float drive_master(float masterTheta, float SlaveTheta, float desiredTheta, floa
     }
     // assign the voltage value to the motor
     analogWrite(motorLVolt, round(abs(voltage/maxVoltage) * MAX_PWM));
+    driveDoneTime = millis();
   }
+
 
   // return the voltage for the slave 
   return voltage;
@@ -297,11 +326,10 @@ void drive_slave(float masterTheta, float slaveTheta, float desiredTheta, float 
 
   // only drive the motor if the error is greater then the shutofferror
   if(error < shutOffError){
-    // set flag
-    driveSlaveComplete = true;
     
     // shut the control off
     analogWrite(motorRVolt, 0);
+
   } else {
 
     // implement the control to set the voltage of the motor
@@ -371,7 +399,7 @@ float turn_master(float masterTheta, float slaveTheta, float desiredTheta, float
     // dont deliver anything
     analogWrite(motorLVolt, 0);
 
-    
+
   } else {
     // set flag
     turnDone = false;
@@ -448,10 +476,8 @@ void turn_slave(float masterTheta, float slaveTheta, float desiredTheta, float m
 
   // see if its close enough to our desired location
   if (error < shutOffError){
-    // set flag
-    turnSlaveComplete= true;
-
     analogWrite(motorRVolt, 0);
+
   } else {
 
     // check if wind up ie check to use integrator
