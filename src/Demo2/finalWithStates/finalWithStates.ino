@@ -41,7 +41,7 @@ float Ki = 1.5; // formerly 1.1
 float I = 0.00;
 
 float Kp_slave = 3;
-float Ki_slave = 1.1; // formerly 1.0
+float Ki_slave = 1.3; // formerly 1.0
 float I_slave = 0.00;
 
 float windUpTolerance = PI/2.3;
@@ -72,12 +72,13 @@ bool turnDone = false;
 bool driveDone = false;
 float driveDoneTime = 0;
 float turnDoneTime = 0;
-float deltaDone = 500;  // time in ms
+float deltaDone = 1500;  // time in ms
 float currentTime = 0;
 
 // data from pi about marker
+float markerAngleRad = 0;
 float markerAngle = PI/2;
-float noMarkerAngle = 0.15;       // rads
+float noMarkerAngle = PI;       // rads
 float markerDistance = 100;
 float markerDistanceTheta = markerDistance / r;
 
@@ -110,8 +111,12 @@ void loop() {
     switch (state) {
         case start:
             state = is_marker_found;
+            Serial.println("Start");
             break;
         case is_marker_found:
+            Serial.println("is_marker_found");
+            motorRight.write(0);
+            motorLeft.write(0);
             if (markerFound) {
                 state = turn_to_marker;
             } else {
@@ -119,28 +124,36 @@ void loop() {
             }
             break;
         case turn_to_find:
+            Serial.println("turn_to_find");
             if (turnDone) {
                 state = is_marker_found;
-            } else {
-                state = turn_to_find;
-            }
+                turnDone = false;
+
+                // reset motor position
+                motorRight.write(0);
+                motorLeft.write(0);
+            } 
             break;
         case turn_to_marker:
+            Serial.println("turn_to_marker");
             if (turnDone) {
                 state = drive_to_marker;
-            } else {
-                state = turn_to_marker;
-            }
+                turnDone = false;
+                motorRight.write(0);
+                motorLeft.write(0);
+            } 
             break;
         case drive_to_marker:
+            Serial.println("drive_to_marker");
             if (driveDone) {
                 state = is_marker_found;
                 
                 // reset the marker found flag
+                driveDone = false;
                 markerFound = false;
+                motorRight.write(0);
+                motorLeft.write(0);
 
-            } else {
-                state = drive_to_marker;
             }
             break;
         case stop:
