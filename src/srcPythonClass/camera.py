@@ -473,7 +473,7 @@ class arducam:
 
                 # return the angle
                 return distance
-        else 
+        else:
             return None
 
 
