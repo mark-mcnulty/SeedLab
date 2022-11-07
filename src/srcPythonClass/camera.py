@@ -498,7 +498,7 @@ if __name__ == "__main__":
             # if there are ids
             if ids is not None:
                 # detect the angle
-                dist = cam.get_distance("image.jpg", corners, ids, h, w)
+                dist = cam.get_marker_distance("image.jpg", corners, ids, h, w)
 
                 # print the quadrant
                 print(dist)
