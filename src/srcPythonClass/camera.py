@@ -48,6 +48,21 @@ class arducam:
         self.rvect = (-0.07666672, -0.10787516, -1.58895402)
         self.tvect = ( 0.42729561, 1.94234642, 21.90400274)
 
+        # print the parameters above 
+        print("ret: ", self.ret)
+        print("mtx: ", self.mtx)
+        print("dist: ", self.dist)
+        print("rvecs: ", self.rvecs)
+        print("tvecs: ", self.tvecs)
+
+        # print the types
+        print()
+        print("ret: ", type(self.ret))
+        print("mtx: ", type(self.mtx))
+        print("dist: ", type(self.dist))
+        print("rvecs: ", type(self.rvecs))
+        print("tvecs: ", type(self.tvecs))
+
         
         time.sleep(2)
 
@@ -346,33 +361,33 @@ if __name__ == "__main__":
     # make the object
     cam = arducam()
 
-    # continuously capture images
-    while True:
-        try:
-            # capture the image
-            cam.capture()
+    # # continuously capture images
+    # while True:
+    #     try:
+    #         # capture the image
+    #         cam.capture()
 
-            # detect the angle
-            dist = cam.get_distance()
+    #         # detect the angle
+    #         dist = cam.get_distance()
 
-            # print the quadrant
-            print(dist)
+    #         # print the quadrant
+    #         print(dist)
 
 
-        # if there is a keyboard interrupt
-        # exit the program
-        # make sure to use ctrl + c to exit
-        # ctrl + z will pause the program and not exit
-        # this will result in the camera getting hung up
-        except KeyboardInterrupt:
-            print("Exiting")
-            # close the camera
-            cam.close()
+    #     # if there is a keyboard interrupt
+    #     # exit the program
+    #     # make sure to use ctrl + c to exit
+    #     # ctrl + z will pause the program and not exit
+    #     # this will result in the camera getting hung up
+    #     except KeyboardInterrupt:
+    #         print("Exiting")
+    #         # close the camera
+    #         cam.close()
 
-            break
+    #         break
 
-        # just for fun
-        print()
+    #     # just for fun
+    #     print()
 
 
 
