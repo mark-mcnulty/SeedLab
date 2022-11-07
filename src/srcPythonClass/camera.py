@@ -2,6 +2,7 @@ import picamera
 import time
 import cv2
 import numpy
+import math
 
 
 '''
@@ -29,10 +30,11 @@ class arducam:
 
         # set the field of view
         self.FOV_X = 53.50
-        self.FOV_Y = 41.41 
+        self.FOV_Y = 41.41
 
-        # set the aruco marker size
-        self.marker_size = 5
+        # set the size of the aruco marker
+        # the aruco marker is 5cm x 5cm
+        self.marker_size = 5 
 
         # set the type of aruco marker
         self.aruco_dict = cv2.aruco.DICT_6X6_50
@@ -288,6 +290,55 @@ class arducam:
     def get_camera_matrix(self, name="image.jpg"):
         print("getting camera matrix")
 
+    def get_distance(self, name="image.jpg", corners=None, ids=None):
+        # get the distance from the camera to the marker
+        # the distance is calculated using the size of the marker
+        # and the size of the image
+        # and the FOV of the camera
+
+        # check that the name has the correct extension
+        if name[-4:] != ".jpg":
+            name = name + ".jpg"
+
+        # read the image
+        img = cv2.imread(name)
+
+        # get the size of the image
+        h, w, c = img.shape
+        size = (w, h)
+        center = (w/2, h/2)
+
+        # check if grey scale
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        # detect the markers
+        aruco_dict = cv2.aruco.Dictionary_get(self.aruco_dict)
+        parameters =  cv2.aruco.DetectorParameters_create()
+        corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
+
+        # check if markers were found
+        if ids is not None:
+            # loop through if there are multiple markers
+            for x in range(len(ids)):
+                # find the mix right side and min left side
+                min_x = 100000
+                max_x = 0
+                for i in range(len(corners[0][0])):
+                    if corners[x][0][i][0] < min_x:
+                        min_x = corners[0][0][i][0]
+                    if corners[x][0][i][0] > max_x:
+                        max_x = corners[0][0][i][0]
+
+                # find pix of marker
+                pix = max_x - min_x
+
+                # calculate the distance
+                distance = (self.marker_size) / (math.tan((self.FOV_X * pix)/size[0]))
+
+                # return the angle
+                return distance
+
+
     
 
 
@@ -301,13 +352,11 @@ if __name__ == "__main__":
             # capture the image
             cam.capture()
 
-            cam.display()
-
             # detect the angle
-            angle = cam.get_marker_location()
+            dist = cam.get_distance()
 
             # print the quadrant
-            print(angle)
+            print(dist)
 
 
         # if there is a keyboard interrupt
