@@ -136,7 +136,7 @@ class arducam:
         cv2.imwrite(name, gray)
 
     # define a function that detects aruco markers in the image
-    def detect_markers(self, name):
+    def detect_markers(self, name="image.jpg"):
         # check that the name has the correct extension
         if name[-4:] != ".jpg":
             name = name + ".jpg"
@@ -292,6 +292,7 @@ class arducam:
     def get_camera_matrix(self, name="image.jpg"):
         print("getting camera matrix")
 
+    # this function will return the distance
     def get_distance(self, name="image.jpg", corners=None, ids=None):
         # get the distance from the camera to the marker
         # the distance is calculated using the size of the marker
@@ -348,6 +349,135 @@ class arducam:
                 # return the angle
                 return distance
 
+    '''
+    detect_markers_undistorted(self, name="image.jpg")
+
+    INPUTS: self - the class object
+            name - the name of the image to be used
+
+    OUTPUTS: corners - the corners of the aruco markers
+                 ids - the ids of the aruco markers
+                   h - the height of the image
+                   w - the width of the image
+
+    DESCRIPTION: this function will detect the aruco markers in the image and return the corners and ids
+    '''
+    def detect_markers_undistorted(self, name="image.jpg"):
+        # check that the name has the correct extension
+        if name[-4:] != ".jpg":
+            name = name + ".jpg"
+
+        # read the image
+        img = cv2.imread(name)
+
+        # get the size of the image
+        h, w, c = img.shape
+        size = (w, h)
+        center = (w/2, h/2)
+
+        h, w = img.shape[:2]
+        newcameramtx, roi = cv2.getOptimalNewCameraMatrix(self.mtx, self.dist, (w,h), 1, (w,h))
+
+        # undistort
+        dst = cv2.undistort(img, self.mtx, self.dist, None, newcameramtx)
+
+        x, y, w, h = roi
+        dst = dst[y:y+h, x:x+w]
+
+        # check if grey scale
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        # detect the markers
+        aruco_dict = cv2.aruco.Dictionary_get(self.aruco_dict)
+        parameters =  cv2.aruco.DetectorParameters_create()
+        corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
+
+        # return the corners and ids
+        return corners, ids, h, w
+
+    '''
+    get_marker_angle(self, name="image.jpg", corners=None, ids=None)
+
+    INPUTS: self - the class object
+            name - the name of the image to be used
+            corners - the corners of the aruco markers
+            ids - the ids of the aruco markers
+    '''
+    def get_marker_angle(self, name="image.jpg", corners=None, ids=None, h=None, w=None):
+        center = (w/2, h/2)
+
+        # check if markers were found
+        if ids is not None:
+            # loop through if there are multiple markers
+
+            for x in range(len(ids)):
+                # find the mix right side and min left side
+                min_x = 100000
+                max_x = 0
+                for i in range(len(corners[0][0])):
+                    if corners[x][0][i][0] < min_x:
+                        min_x = corners[0][0][i][0]
+                    if corners[x][0][i][0] > max_x:
+                        max_x = corners[0][0][i][0]
+
+                # find the center of the aruco marker
+                centerObject = (min_x + max_x) / 2
+
+                # if the center of the aruco marker is less than the center of the image
+                # then the aruco marker is to the left of the center of the image making the angle negative
+                if centerObject < center[0]:
+                    angle = -1 * (self.FOV_X / 2) * ( (abs(centerObject - center[0])) / (abs(center[0] - size[0])) )
+                else:
+                    angle = (self.FOV_X / 2) * ( (abs(centerObject - center[0])) / (abs(center[0] - size[0])) )
+
+                # return the angle
+                return angle
+            
+        else:
+            return None
+
+    '''
+    get_marker_distance(self, name="image.jpg", corners=None, ids=None, h=None, w=None)
+
+    INPUTS: self - the class object
+            name - the name of the image to be used
+            corners - the corners of the aruco markers
+            ids - the ids of the aruco markers
+
+    OUTPUTS: distance - the distance to the aruco marker
+
+    DESCRIPTION: this function will return the distance to the aruco marker
+    '''
+    def get_marker_distance(self, name="image.jpg", corners=None, ids=None, h=None, w=None):
+        center = (w/2, h/2)
+        size = (w, h)
+
+        # check if markers were found
+        if ids is not None:
+            # loop through if there are multiple markers
+            for x in range(len(ids)):
+                # find the mix right side and min left side
+                min_x = 100000
+                max_x = 0
+                for i in range(len(corners[0][0])):
+                    if corners[x][0][i][0] < min_x:
+                        min_x = corners[0][0][i][0]
+                    if corners[x][0][i][0] > max_x:
+                        max_x = corners[0][0][i][0]
+
+                # find pix of marker
+                pix = max_x - min_x
+
+                # calculate the distance
+                distance = (self.marker_size) / (math.tan((math.radians(self.FOV_X) * pix)/size[0]))
+
+                # return the angle
+                return distance
+        else 
+            return None
+
+
+
 
     
 
@@ -356,33 +486,33 @@ if __name__ == "__main__":
     # make the object
     cam = arducam()
 
-    # # continuously capture images
-    # while True:
-    #     try:
-    #         # capture the image
-    #         cam.capture()
+    # continuously capture images
+    while True:
+        try:
+            # capture the image
+            cam.capture()
 
-    #         # detect the angle
-    #         dist = cam.get_distance()
+            # detect the markers
+            corners, ids, h, w = cam.detect_markers_undistorted()
 
-    #         # print the quadrant
-    #         print(dist)
+            # if there are ids
+            if ids is not None:
+                # detect the angle
+                dist = cam.get_distance("image.jpg", corners, ids, h, w)
 
+                # print the quadrant
+                print(dist)
 
-    #     # if there is a keyboard interrupt
-    #     # exit the program
-    #     # make sure to use ctrl + c to exit
-    #     # ctrl + z will pause the program and not exit
-    #     # this will result in the camera getting hung up
-    #     except KeyboardInterrupt:
-    #         print("Exiting")
-    #         # close the camera
-    #         cam.close()
+        # if there is a keyboard interrupt exit program
+        except KeyboardInterrupt:
+            print("Exiting")
+            # close the camera
+            cam.close()
 
-    #         break
+            break
 
-    #     # just for fun
-    #     print()
+        # just for fun
+        print()
 
 
 
