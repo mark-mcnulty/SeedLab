@@ -333,7 +333,7 @@ class arducam:
                 pix = max_x - min_x
 
                 # calculate the distance
-                distance = (self.marker_size) / (math.tan((self.FOV_X * pix)/size[0]))
+                distance = (self.marker_size) / (math.tan((math.radians(self.FOV_X) * pix)/size[0]))
 
                 # return the angle
                 return distance
