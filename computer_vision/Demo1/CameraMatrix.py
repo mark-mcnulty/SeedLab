@@ -5,6 +5,7 @@ import sys
 import cv2 as cv
 import numpy as np
 import glob 
+import pickle
 
 # camera matrix is defined as a 3x3 matrix
 #
@@ -60,21 +61,28 @@ if __name__ == "__main__":
 
     ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
 
-    # print the parameters above 
-    print("ret: ", ret)
-    print("mtx: ", mtx)
-    print("dist: ", dist)
-    print("rvecs: ", rvecs)
-    print("tvecs: ", tvecs)
+    # save the camera matrix and distortion coefficients
+    cameraMatrix = [ret, mtx, dist, rvecs, tvecs]
 
-    # print the types
-    print()
-    print("ret: ", type(ret))
-    print("mtx: ", type(mtx))
-    print("dist: ", type(dist))
-    print("rvecs: ", type(rvecs))
-    print("tvecs: ", type(tvecs))
+    # save the camera matrix and distortion coefficients
+    with open('cameraMatrix.pkl', 'wb') as f:
+        pickle.dump(cameraMatrix, f)
 
-    img = cv.imread('1.jpg')
-    h,  w = img.shape[:2]
-    newcameramtx, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
+    # # print the parameters above 
+    # print("ret: ", ret)
+    # print("mtx: ", mtx)
+    # print("dist: ", dist)
+    # print("rvecs: ", rvecs)
+    # print("tvecs: ", tvecs)
+
+    # # print the types
+    # print()
+    # print("ret: ", type(ret))
+    # print("mtx: ", type(mtx))
+    # print("dist: ", type(dist))
+    # print("rvecs: ", type(rvecs))
+    # print("tvecs: ", type(tvecs))
+
+    # img = cv.imread('1.jpg')
+    # h,  w = img.shape[:2]
+    # newcameramtx, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
