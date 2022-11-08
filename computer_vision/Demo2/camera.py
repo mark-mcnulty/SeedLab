@@ -405,6 +405,7 @@ class arducam:
     '''
     def get_marker_angle(self, name="image.jpg", corners=None, ids=None, h=None, w=None):
         center = (w/2, h/2)
+        size = (w, h)
 
         # check if markers were found
         if ids is not None:
@@ -511,7 +512,9 @@ if __name__ == "__main__":
             # if there are ids
             if ids is not None:
                 # detect the distance
-                dist = cam.get_marker_distance_func("image.jpg", corners, ids, h, w)
+                # dist = cam.get_marker_distance_func("image.jpg", corners, ids, h, w)
+                dist = cam.get_marker_angle("image.jpg", corners, ids, h, w)
+
 
             print(dist)
 
