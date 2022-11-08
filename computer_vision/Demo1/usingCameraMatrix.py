@@ -16,7 +16,7 @@ if __name__ == "__main__":
     tvecs = cameraMatrix[4]
 
     # undistort the image
-    img = cv.imread('17.jpg')
+    img = cv.imread('1.jpg')
 
     h,  w = img.shape[:2]
     newcameramtx, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
@@ -26,5 +26,5 @@ if __name__ == "__main__":
 
     # crop the image
     x, y, w, h = roi
-    # dst = dst[y:y+h, x:x+w]
+    dst = dst[y:y+h, x:x+w]
     cv.imwrite('calibresult.jpg', dst)
