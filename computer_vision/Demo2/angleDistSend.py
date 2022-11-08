@@ -52,7 +52,7 @@ state_dictionary = {
 if __name__ == "__main__":
     state = look
 
-    cam = camera.Camera()
+    cam = camera.arducam()
 
     try:
         while True:
