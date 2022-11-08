@@ -10,7 +10,7 @@ def look(cam):
     DISTANCE = 0
 
     # take picture
-    cam.takePicture()
+    cam.capture()
 
     # check for object
     # detect the markers
