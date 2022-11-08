@@ -46,7 +46,7 @@ float shutOffDistance = 5;
 
 // Controls variables
 float shutOffError = 0.01;
-float Kp = 3;
+float Kp = 2.7;
 float Ki = 1.1; // formerly 1.1
 float I = 0.00;
 
