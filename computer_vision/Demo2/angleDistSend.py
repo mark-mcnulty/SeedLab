@@ -1,6 +1,6 @@
 import camera
 
-def look(cam, angle, distance):
+def look_calc(cam):
     # take picture
     cam.capture()
     angle = 0
@@ -18,24 +18,24 @@ def look(cam, angle, distance):
 
         return send, angle, distance
     else:
-        return look, angle, distance
+        return look_calc, angle, distance
 
 
 def send(cam, angle, distance):
     # 
-    print(angle + " " + distance)
+    print(str(angle) + " " + str(distance))
 
     return look
 
 state_dictionary = {
-    look: "looking",
+    look_calc: "looking",
     send: "sending"
 }
 
 
 # create main loop
 if __name__ == "__main__":
-    state = look
+    state = look_calc
 
     cam = camera.arducam()
     
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     try:
         while True:
             print("main")
-            new_state, angle, distance = state(cam, angle, distance)
+            new_state= state(cam)
             state = new_state
     except KeyboardInterrupt:
         print("KeyboardInterrupt")
