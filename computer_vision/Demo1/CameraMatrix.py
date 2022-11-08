@@ -24,7 +24,7 @@ if __name__ == "__main__":
     print("hello world")
 
     # define the size of the checkerboard
-    CHECKERBOARD = (11,8)
+    CHECKERBOARD = (7,10)
 
     # determine the criteria for the calibration
     criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
@@ -44,16 +44,17 @@ if __name__ == "__main__":
         gray = cv.cvtColor(img,cv.COLOR_BGR2GRAY)
 
         # Find the chess board corners
-        ret, corners = cv.findChessboardCorners(gray, (7,6),None)
+        ret, corners = cv.findChessboardCorners(gray, CHECKERBOARD,None)
 
         if ret == True:
+            print("true")
             objpoints.append(objp)
 
             corners2 = cv.cornerSubPix(gray,corners, (11,11), (-1,-1), criteria)
             imgpoints.append(corners2)
 
             # Draw and display the corners
-            cv.drawChessboardCorners(img, (7,6), corners2, ret)
+            cv.drawChessboardCorners(img, CHECKERBOARD, corners2, ret)
             cv.imshow('img', img)
             cv.waitKey(500)
 
