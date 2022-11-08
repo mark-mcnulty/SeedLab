@@ -23,7 +23,7 @@ def look(cam, angle, distance):
 
 def send(cam, angle, distance):
     # 
-    print(angle + " " + distance)
+    print(str(angle) + " " + str(distance))
 
     return look
 
