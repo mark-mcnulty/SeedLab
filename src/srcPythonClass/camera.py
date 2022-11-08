@@ -476,6 +476,14 @@ class arducam:
         else:
             return None
 
+    def get_marker_distance_func(self, name="image.jpg", corners=None, ids=None, h=None, w=None):
+        center = (w/2, h/2)
+        size = (w, h)
+
+        rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners, self.marker_size, self.mtx, self.dist)
+
+        return tvec
+
 
 
 
@@ -499,7 +507,7 @@ if __name__ == "__main__":
             # if there are ids
             if ids is not None:
                 # detect the distance
-                dist = cam.get_marker_distance("image.jpg", corners, ids, h, w)
+                dist = cam.get_marker_distance_func("image.jpg", corners, ids, h, w)
 
             print(dist)
 
