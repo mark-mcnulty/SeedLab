@@ -482,7 +482,10 @@ class arducam:
 
         rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners, self.marker_size, self.mtx, self.dist)
 
-        return tvec
+        # check if markers were found
+        dist = math.pow(math.pow(tvec[0][0][0], 2) + math.pow(tvec[0][0][1], 2) + math.pow(tvec[0][0][2], 2), 0.5) 
+        # return tvec
+
 
 
 
