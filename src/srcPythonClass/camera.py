@@ -484,6 +484,7 @@ class arducam:
 
         # check if markers were found
         dist = math.pow(math.pow(tvec[0][0][0], 2) + math.pow(tvec[0][0][1], 2) + math.pow(tvec[0][0][2], 2), 0.5) 
+        return dist
         # return tvec
 
 
