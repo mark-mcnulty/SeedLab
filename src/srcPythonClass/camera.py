@@ -491,17 +491,17 @@ if __name__ == "__main__":
         try:
             # capture the image
             cam.capture()
+            dist = None
 
             # detect the markers
             corners, ids, h, w = cam.detect_markers_undistorted()
 
             # if there are ids
             if ids is not None:
-                # detect the angle
+                # detect the distance
                 dist = cam.get_marker_distance("image.jpg", corners, ids, h, w)
 
-                # print the quadrant
-                print(dist)
+            print(dist)
 
         # if there is a keyboard interrupt exit program
         except KeyboardInterrupt:
