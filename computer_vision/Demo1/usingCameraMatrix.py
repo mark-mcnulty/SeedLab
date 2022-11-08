@@ -16,7 +16,7 @@ if __name__ == "__main__":
     tvecs = cameraMatrix[4]
 
     # undistort the image
-    img = cv.imread('19.jpg')
+    img = cv.imread('17.jpg')
 
     h,  w = img.shape[:2]
     newcameramtx, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
