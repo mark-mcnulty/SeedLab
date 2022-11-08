@@ -36,7 +36,7 @@ float shutOffDistance = 5;
 
 // Controls variables
 float shutOffError = 0.01;
-float Kp = 3.0; // best 2.9
+float Kp = 2.7; // best 2.9
 float Ki = 3.0; // best 3.0
 float I = 0.00;
 
@@ -78,7 +78,7 @@ float currentTime = 0;
 // data from pi about marker
 float markerAngleRad = 0;
 float markerAngle = PI/2;
-float noMarkerAngle = PI;       // rads
+float noMarkerAngle = PI/6;       // rads
 float markerDistance = 100;
 float markerDistanceTheta = markerDistance / r;
 
