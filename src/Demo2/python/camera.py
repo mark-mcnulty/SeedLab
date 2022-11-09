@@ -38,7 +38,7 @@ class arducam:
         self.marker_size = 5 
 
         # set the type of aruco marker
-        self.aruco_dict = cv2.aruco.DICT_6X6_50
+        self.aruco_dict = cv2.aruco.DICT_4X4_50
 
         # open the pickle file cameraMatrix.pkl
         with open("cameraMatrix.pkl", "rb") as f:
