@@ -46,6 +46,7 @@ def send(bus, angle, distance):
     byteValue = StringToBytes(temp)
     bus.write_i2c_block_data(0x04, 0, byteValue)
     print(str(angle) + " " + str(distance))
+    time.sleep(0.5)
 
 def StringToBytes(val):
     retVal = []

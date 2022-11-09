@@ -68,7 +68,7 @@ typedef enum {
 states state = start;
 
 // flags for states
-volatile bool markerFound = false;
+volatile bool markerFound = true;
 bool turnDone = false;
 bool driveDone = false;
 bool turnDriveDone = false;
@@ -79,10 +79,10 @@ float currentTime = 0;
 
 // data from pi about marker
 float markerAngle = 0;
-float markerAngleRad = 0;
+float markerAngleRad = PI/3;
 float noMarkerAngle = PI/6;       // rads
-// float markerDistance = 0;
-float markerDistanceTheta = 0;
+float markerDistance = 100;
+float markerDistanceTheta = markerDistance / r;
 int driveCorrect = 3; // cm
 
 // for i2c communication
@@ -118,11 +118,11 @@ void setup() {
 
   // setup communication
   // initialize i2c as slave
-  Wire.begin(SLAVE_ADDRESS);
+//   Wire.begin(SLAVE_ADDRESS);
 
-  // define callbacks for i2c communication
-  Wire.onReceive(receiveEvent);
-  // Wire.onRequest(requestEvent);
+//   // define callbacks for i2c communication
+//   Wire.onReceive(receiveEvent);
+//   // Wire.onRequest(requestEvent);
 }
 
 
@@ -130,8 +130,6 @@ void setup() {
 void loop() {
     // define the time_start
     time_start = millis();
-
-    int foundCount = 0;
 
 
     // control unit
@@ -168,17 +166,12 @@ void loop() {
             // float windUpTolerance = PI/2;
             Serial.println("turn_to_marker");
             if (turnDone) {
-
-                foundCount += 1;
+                Serial.println("turn_to_marker_done");
+                state = drive_to_marker;
                 motorRight.write(0);
                 motorLeft.write(0);
                 I_slave = 0;
                 I = 0;
-
-                if (foundCount == 2){
-                  Serial.println("turn_to_marker_done");
-                  state = drive_to_marker;
-                }
             } 
             break;
         case drive_to_marker:
@@ -250,32 +243,32 @@ void loop() {
 /* 
 DATA FROM PI
 */
-void receiveEvent(int howMany) {
+// void receiveEvent(int howMany) {
 
-  for (int i = 0; i < howMany; i++) {
-    temp[i] = Wire.read();
-    temp[i + 1] = '\0'; //add null after ea. char
-  }
+//   for (int i = 0; i < howMany; i++) {
+//     temp[i] = Wire.read();
+//     temp[i + 1] = '\0'; //add null after ea. char
+//   }
 
-  //RPi first byte is cmd byte so shift everything to the left 1 pos so temp contains our string
-  for (int i = 0; i < howMany; ++i) {
-    temp[i] = temp[i + 1];
-  }
-  swag = temp ;
-  index = swag.indexOf(' ') ;
-  len = swag.length() ;
-  distanceTemp = swag.substring(0,index) ;
-  angleTemp = swag.substring(index, len - 1) ;
-  markerDistanceTheta = (distanceTemp.toFloat() - driveCorrect) / r ;
-  markerAngleRad = (angleTemp.toFloat() * PI) / 180 ;
-  markerFound = true;
-  Serial.print("distance: ");
-  Serial.print(markerDistanceTheta);
-  Serial.println();
-  Serial.print("angle: ");
-  Serial.print(markerAngleRad);
-  Serial.println();
-}
+//   //RPi first byte is cmd byte so shift everything to the left 1 pos so temp contains our string
+//   for (int i = 0; i < howMany; ++i) {
+//     temp[i] = temp[i + 1];
+//   }
+//   swag = temp ;
+//   index = swag.indexOf(' ') ;
+//   len = swag.length() ;
+//   distanceTemp = swag.substring(0,index) ;
+//   angleTemp = swag.substring(index, len - 1) ;
+//   markerDistanceTheta = (distanceTemp.toFloat() - driveCorrect) / r ;
+//   markerAngleRad = (angleTemp.toFloat() * PI) / 180 ;
+//   markerFound = true;
+//   Serial.print("distance: ");
+//   Serial.print(markerDistanceTheta);
+//   Serial.println();
+//   Serial.print("angle: ");
+//   Serial.print(markerAngleRad);
+//   Serial.println();
+// }
 
 /* 
 SENDING TO PI
