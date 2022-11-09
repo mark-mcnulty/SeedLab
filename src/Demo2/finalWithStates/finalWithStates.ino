@@ -121,6 +121,7 @@ void setup() {
 
   // define callbacks for i2c communication
   Wire.onReceive(receiveEvent);
+  Wire.onRequest(requestEvent);
 }
 
 
@@ -147,7 +148,7 @@ void loop() {
             }
             break;
         case turn_to_find:
-            Serial.println("turn_to_find");
+            // Serial.println("turn_to_find");
             if (turnDone) {
                 state = is_marker_found;
                 turnDone = false;
@@ -253,6 +254,7 @@ void receiveEvent(int howMany) {
 SENDING TO PI
 */
 void requestEvent() {
+  Serial.println("requested");
   if(turnDriveDone == true){
     Wire.write("1");
     turnDriveDone = false;
