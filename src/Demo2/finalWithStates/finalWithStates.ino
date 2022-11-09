@@ -2,6 +2,7 @@
 #include "DualMC33926MotorShield.h"
 #include <Wire.h>
 #include <Encoder.h>
+#include <String.h>
 
 
 #define ENCODER_OPTIMIZE_INTERRUPTS
@@ -67,9 +68,10 @@ typedef enum {
 states state = start;
 
 // flags for states
-bool markerFound = true;
+volatile bool markerFound = true;
 bool turnDone = false;
 bool driveDone = false;
+bool turnDriveDone = false;
 float driveDoneTime = 0;
 float turnDoneTime = 0;
 float deltaDone = 1500;  // time in ms
@@ -82,10 +84,24 @@ float noMarkerAngle = PI/6;       // rads
 float markerDistance = 100;
 float markerDistanceTheta = markerDistance / r;
 
+// for i2c communication
+char temp[32];
+String command;
+String swag ;
+String distanceTemp ;
+String angleTemp ;
+float distance ;
+float angle ;
+int index ;
+int len ;
+size_t sz ;
+
 
 
 void setup() {
-  Serial.begin(115200) ;
+  // Serial.begin(115200) ;
+  Serial.begin(9600);
+
   // set the pins
   pinMode(enable, OUTPUT);
   pinMode(motorLDir, OUTPUT);
@@ -98,6 +114,13 @@ void setup() {
   digitalWrite(enable, HIGH);
   analogWrite(motorLVolt, 0);
   analogWrite(motorRVolt, 0);
+
+  // setup communication
+  // initialize i2c as slave
+  Wire.begin(SLAVE_ADDRESS);
+
+  // define callbacks for i2c communication
+  Wire.onReceive(receiveEvent);
 }
 
 
@@ -151,9 +174,10 @@ void loop() {
                 // reset the marker found flag
                 driveDone = false;
                 markerFound = false;
+                turnDriveDone = true;
+
                 motorRight.write(0);
                 motorLeft.write(0);
-
             }
             break;
         case stop:
@@ -204,12 +228,40 @@ void loop() {
 /* 
 DATA FROM PI
 */
-void receivePiData(){
-    // read the data line
+void receiveEvent(int howMany) {
 
-    // tell that the marker is found
-    markerFound = true;
+  for (int i = 0; i < howMany; i++) {
+    temp[i] = Wire.read();
+    temp[i + 1] = '\0'; //add null after ea. char
+  }
+
+  //RPi first byte is cmd byte so shift everything to the left 1 pos so temp contains our string
+  for (int i = 0; i < howMany; ++i) {
+    temp[i] = temp[i + 1];
+  }
+  swag = temp ;
+  index = swag.indexOf(' ') ;
+  len = swag.length() ;
+  distanceTemp = swag.substring(0,index) ;
+  angleTemp = swag.substring(index, len - 1) ;
+  distance = distanceTemp.toFloat() ;
+  angle = angleTemp.toFloat() ;
+  markerFound = true;
 }
+
+/* 
+SENDING TO PI
+*/
+void requestEvent() {
+  if(turnDriveDone == true){
+    Wire.write("1");
+    turnDriveDone = false;
+  }
+  else{
+    Wire.write("0");
+  }
+}
+
 
 /* 
 TURN STATE

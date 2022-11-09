@@ -101,13 +101,3 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("Exiting...")
 
-
-
-    # try:
-    #     while True:
-    #         print("main")
-    #         new_state= state(cam)
-    #         state = new_state
-    # except KeyboardInterrupt:
-    #     print("KeyboardInterrupt")
-    #     print("Exiting")
