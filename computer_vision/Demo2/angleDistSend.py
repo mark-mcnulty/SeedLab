@@ -1,8 +1,11 @@
 import camera
 
-def look_calc(cam):
+def look_and_calc(cam):
     # take picture
     cam.capture()
+
+
+    detected = False
     angle = 0
     distance = 0
 
@@ -13,40 +16,63 @@ def look_calc(cam):
     # check if the markers are found
     if ids is not None:
         # calculate the angle
-        distance = cam.get_marker_distance_func("image.jpg", corners, ids, h, w)
+        detected = True
         angle = cam.get_marker_angle("image.jpg", corners, ids, h, w)
+        distance = cam.get_marker_distance_func("image.jpg", corners, ids, h, w)
 
-        return send, angle, distance
+        return detected, angle, distance
     else:
-        return look_calc, angle, distance
+        return detected, angle, distance
 
 
-def send(cam, angle, distance):
+def send(angle, distance):
     # 
     print(str(angle) + " " + str(distance))
 
-    return look
 
 state_dictionary = {
-    look_calc: "looking",
+    look_and_calc: "looking",
     send: "sending"
 }
 
 
 # create main loop
 if __name__ == "__main__":
-    state = look_calc
 
     cam = camera.arducam()
+    print("activated camera")
     
+    state = "look_and_calc"
     angle = 0
     distance = 0
+    detected = False
 
-    try:
+    try: 
         while True:
-            print("main")
-            new_state= state(cam)
-            state = new_state
+            if state == "look_and_calc":
+                detected, angle, distance = look_and_calc(cam)
+
+                # switch to send state
+                if detected:
+                    state = "send"
+
+            elif state == "send":
+                send(angle, distance)
+                detected = False
+
+                # switch to look_and_calc
+                state = "look_and_calc"
+
     except KeyboardInterrupt:
-        print("KeyboardInterrupt")
-        print("Exiting")
+        print("Exiting...")
+
+
+
+    # try:
+    #     while True:
+    #         print("main")
+    #         new_state= state(cam)
+    #         state = new_state
+    # except KeyboardInterrupt:
+    #     print("KeyboardInterrupt")
+    #     print("Exiting")
