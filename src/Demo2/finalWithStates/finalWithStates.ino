@@ -36,7 +36,7 @@ float u;
 float shutOffDistance = 5;
 
 // Controls variables
-float shutOffError = 0.01;
+float shutOffError = 0.03;
 float Kp = 2.7; // best 2.9
 float Ki = 3.0; // best 3.0
 float I = 0.00;
@@ -83,7 +83,9 @@ float markerAngleRad = 0;
 float noMarkerAngle = PI/6;       // rads
 // float markerDistance = 0;
 float markerDistanceTheta = 0;
+float markerDistanceThetaStartOfState = 0;
 int driveCorrect = 3; // cm
+int foundCount = 0;
 
 // for i2c communication
 char temp[32];
@@ -131,8 +133,6 @@ void loop() {
     // define the time_start
     time_start = millis();
 
-    int foundCount = 0;
-
 
     // control unit
     switch (state) {
@@ -168,14 +168,17 @@ void loop() {
             // float windUpTolerance = PI/2;
             Serial.println("turn_to_marker");
             if (turnDone) {
+                Serial.println("Finish marker Turn");
 
-                foundCount += 1;
+                markerDistanceThetaStartOfState = markerDistanceTheta;
+                foundCount = 1 + foundCount;
+                turnDone = false;
                 motorRight.write(0);
                 motorLeft.write(0);
                 I_slave = 0;
                 I = 0;
 
-                if (foundCount == 2){
+                if (foundCount >= 2){
                   Serial.println("turn_to_marker_done");
                   state = drive_to_marker;
                 }
@@ -229,7 +232,7 @@ void loop() {
         // drive to the marker if the marker is found
         case drive_to_marker:
             // Serial.println(markerDistanceTheta);            
-            drive(markerDistanceTheta, time_start, time_past);
+            drive(markerDistanceThetaStartOfState, time_start, time_past);
             break;
 
         // stop
