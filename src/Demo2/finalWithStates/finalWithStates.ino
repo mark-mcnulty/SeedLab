@@ -68,7 +68,7 @@ typedef enum {
 states state = start;
 
 // flags for states
-volatile bool markerFound = true;
+volatile bool markerFound = false;
 bool turnDone = false;
 bool driveDone = false;
 bool turnDriveDone = false;

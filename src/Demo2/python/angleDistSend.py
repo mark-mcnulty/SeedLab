@@ -8,7 +8,7 @@ address = 0x04
 
 def wait():
     number = bus.read_byte_data(address, 0, 32)
-    time.sleep(0.5)
+    time.sleep(2)
     print(number)
     if number == 1:
         turnDriveDone = True
@@ -51,9 +51,6 @@ def StringToBytes(val):
     for c in val:
         retVal.append(ord(c))
     return retVal
-
-def wait():
-    print("waiting for response")
 
 
 state_dictionary = {
