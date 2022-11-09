@@ -1,4 +1,7 @@
 import camera
+import smbus
+import time
+ids = []
 
 def look_and_calc(cam):
     # take picture
@@ -25,9 +28,20 @@ def look_and_calc(cam):
         return detected, angle, distance
 
 
-def send(angle, distance):
-    # 
+def send(bus, angle, distance):
+    temp = str(distance) + " " + str(angle)
+    byteValue = StringToBytes(temp)
+    bus.write_i2c_block_data(0x04, 0, byteValue)
     print(str(angle) + " " + str(distance))
+
+def StringToBytes(val):
+    retVal = []
+    for c in val:
+        retVal.append(ord(c))
+    return retVal
+
+def wait():
+    print("waiting for response")
 
 
 state_dictionary = {
@@ -38,7 +52,7 @@ state_dictionary = {
 
 # create main loop
 if __name__ == "__main__":
-
+    bus = smbus.SMBus(1)
     cam = camera.arducam()
     print("activated camera")
     
@@ -57,7 +71,7 @@ if __name__ == "__main__":
                     state = "send"
 
             elif state == "send":
-                send(angle, distance)
+                send(bus, angle, distance)
                 detected = False
 
                 # switch to look_and_calc
