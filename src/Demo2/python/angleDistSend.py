@@ -8,7 +8,7 @@ address = 0x04
 
 def wait():
     # number = bus.read_byte_data(address)
-    number = bus.read_byte_data(address, 0x01)
+    number = bus.self._bus.read_byte(address) & 0xff
     time.sleep(5)
     print(number)
     if number == 1:
