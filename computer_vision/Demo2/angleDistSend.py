@@ -29,6 +29,8 @@ def look_and_calc(cam):
 
 
 def send(bus, angle, distance):
+    distance = round(distance, 2)
+    angle = round(angle, 2)
     temp = str(distance) + " " + str(angle)
     byteValue = StringToBytes(temp)
     bus.write_i2c_block_data(0x04, 0, byteValue)
