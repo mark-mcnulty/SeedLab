@@ -149,7 +149,7 @@ void loop() {
             break;
         case turn_to_find:
             windUpTolerance = PI/6.5;
-            // Serial.println("turn_to_find");
+            Serial.println("turn_to_find");
             if (turnDone) {
                 state = is_marker_found;
                 turnDone = false;
@@ -163,6 +163,7 @@ void loop() {
             float windUpTolerance = PI/2;
             Serial.println("turn_to_marker");
             if (turnDone) {
+                Serial.println("turn_to_marker_done");
                 state = drive_to_marker;
                 turnDone = false;
                 motorRight.write(0);
