@@ -86,7 +86,7 @@ if __name__ == "__main__":
                 detected = False
 
                 # switch to look_and_calc
-                state = "wait"
+                state = "look_and_calc"
 
             elif state == "wait":
                 wait()
