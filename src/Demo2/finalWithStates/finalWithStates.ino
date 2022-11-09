@@ -78,8 +78,8 @@ float deltaDone = 1500;  // time in ms
 float currentTime = 0;
 
 // data from pi about marker
+float markerAngle = 0;
 float markerAngleRad = 0;
-float markerAngle = PI/2;
 float noMarkerAngle = PI/6;       // rads
 float markerDistance = 100;
 float markerDistanceTheta = markerDistance / r;
@@ -121,7 +121,7 @@ void setup() {
 
   // define callbacks for i2c communication
   Wire.onReceive(receiveEvent);
-  Wire.onRequest(requestEvent);
+  // Wire.onRequest(requestEvent);
 }
 
 
@@ -148,7 +148,7 @@ void loop() {
             }
             break;
         case turn_to_find:
-            windUpTolerance = PI/6.5;
+            // windUpTolerance = PI/6.5;
             Serial.println("turn_to_find");
             if (turnDone) {
                 state = is_marker_found;
@@ -157,31 +157,38 @@ void loop() {
                 // reset motor position
                 motorRight.write(0);
                 motorLeft.write(0);
+                I_slave = 0;
+                I = 0;
             } 
             break;
         case turn_to_marker:
-            float windUpTolerance = PI/2;
+            // float windUpTolerance = PI/2;
             Serial.println("turn_to_marker");
             if (turnDone) {
                 Serial.println("turn_to_marker_done");
                 state = drive_to_marker;
-                turnDone = false;
                 motorRight.write(0);
                 motorLeft.write(0);
+                I_slave = 0;
+                I = 0;
             } 
             break;
         case drive_to_marker:
             Serial.println("drive_to_marker");
             if (driveDone) {
+                Serial.println("drive done");
                 state = is_marker_found;
                 
                 // reset the marker found flag
+                turnDone = false;
                 driveDone = false;
                 markerFound = false;
                 turnDriveDone = true;
 
                 motorRight.write(0);
                 motorLeft.write(0);
+                I_slave = 0;
+                I = 0;
             }
             break;
         case stop:
@@ -207,11 +214,13 @@ void loop() {
 
         // turn to the marker if the marker is found
         case turn_to_marker:
-            turn(markerAngle, time_start, time_past);
+            // Serial.println(markerAngleRad);
+            turn(markerAngleRad, time_start, time_past);
             break;
 
         // drive to the marker if the marker is found
         case drive_to_marker:
+            // Serial.println(markerDistanceTheta);            
             drive(markerDistanceTheta, time_start, time_past);
             break;
 
@@ -219,6 +228,7 @@ void loop() {
         case stop:
             break;
         default:
+            Serial.println("defalut");
             break;
     }
 
@@ -248,24 +258,30 @@ void receiveEvent(int howMany) {
   len = swag.length() ;
   distanceTemp = swag.substring(0,index) ;
   angleTemp = swag.substring(index, len - 1) ;
-  distance = distanceTemp.toFloat() ;
-  angle = angleTemp.toFloat() ;
+  markerDistanceTheta = distanceTemp.toFloat() / r ;
+  markerAngleRad = (angleTemp.toFloat() * PI) / 180 ;
   markerFound = true;
+  Serial.print("distance: ");
+  Serial.print(markerDistanceTheta);
+  Serial.println();
+  Serial.print("angle: ");
+  Serial.print(markerAngleRad);
+  Serial.println();
 }
 
 /* 
 SENDING TO PI
 */
-void requestEvent() {
-  Serial.println("requested");
-  if(turnDriveDone == true){
-    Wire.write("1");
-    turnDriveDone = false;
-  }
-  else{
-    Wire.write("0");
-  }
-}
+// void requestEvent() {
+//   Serial.println("requested");
+//   if(turnDriveDone == true){
+//     Wire.write("1");
+//     turnDriveDone = false;
+//   }
+//   else{
+//     Wire.write("0");
+//   }
+// }
 
 
 /* 
@@ -286,6 +302,7 @@ void turn(float desiredThetaTurn, float time_start, float time_past) {
 DRIVE STATE
 */
 void drive(float desiredTheta, float time_start, float time_past) {
+  // Serial.println("drive");
   // set variables
   float masterVoltage = 0;
   float thetaLeft= (2*PI* motorLeft.read()) / COUNTS_PER_ROTATION;
@@ -328,10 +345,12 @@ float drive_master(float masterTheta, float SlaveTheta, float desiredTheta, floa
   if(error < shutOffError){
     // assign current time
     currentTime = millis();
+    // Serial.println("error");
 
     // check if the time is greater then the delta time
-    if (currentTime - driveDoneTime > deltaDone) {
+      if (currentTime > driveDoneTime + deltaDone) {
       // set the drive done flag
+      Serial.println("state finish");
       driveDone = true;
     }
 
