@@ -14,6 +14,7 @@ float angle ;
 int index ;
 int len ;
 size_t sz ;
+bool turnDriveDone = false ;
 
 void setup() {
   // initialize i2c as slave
@@ -55,5 +56,14 @@ void receiveEvent(int howMany) {
   distance = distanceTemp.toFloat() ;
   angle = angleTemp.toFloat() ;
   //distance = stof(
-  receiveFlag = true;
+  //receiveFlag = true;
+}
+
+void requestEvent() {
+  if(turnDriveDone == true){
+    Wire.write("1");
+  }
+  else{
+    Wire.write("0");
+  }
 }
