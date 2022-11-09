@@ -7,7 +7,8 @@ turnDriveDone = False
 address = 0x04
 
 def wait():
-    number = bus.read_byte_data(address)
+    # number = bus.read_byte_data(address)
+    number = bus.read_byte(address)
     time.sleep(2)
     print(number)
     if number == 1:
