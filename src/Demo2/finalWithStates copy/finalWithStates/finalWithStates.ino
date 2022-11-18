@@ -36,7 +36,7 @@ float u;
 float shutOffDistance = 5;
 
 // Controls variables
-float shutOffError = 0.05;
+float shutOffError = 0.03;
 float Kp = 2.7; // best 2.9
 float Ki = 3.0; // best 3.0
 float I = 0.00;
@@ -48,10 +48,8 @@ float I_slave = 0.00;
 float windUpTolerance = PI/2;         //PI/2.3
 int MAX_PWM = 175;
 
-float maxVoltage = 7.7;
-float maxBattery = 7.7;
-float maxVoltageMaster = 6;
-float maxVoltageSlave = 7.7;
+float maxVoltage = 7;
+float maxVoltageSlave = 7.3;
 
 float period = 10;
 float time_start;
@@ -82,11 +80,10 @@ float currentTime = 0;
 // data from pi about marker
 float markerAngle = 0;
 float markerAngleRad = 0;
-float noMarkerAngle = PI/5;       // rads
+float noMarkerAngle = PI/6;       // rads
 // float markerDistance = 0;
 float markerDistanceTheta = 0;
 float markerDistanceThetaStartOfState = 0;
-float markerAngleTolerance = 0.025; // rads
 int driveCorrect = 3; // cm
 int foundCount = 0;
 
@@ -156,18 +153,6 @@ void loop() {
         case turn_to_find:
             // windUpTolerance = PI/6.5;
             Serial.println("turn_to_find");
-
-            // faster controller gain values for searching
-            shutOffError = 0.2; // 0.03
-            Kp = 5; // best 2.9
-            Ki = 5.5; // best 3.0
-            //float I = 0.00;
-
-            Kp_slave = 2.7; //best 2.7
-            Ki_slave = 1.7; // formerly 1.1
-            I_slave = 0.00;
-            MAX_PWM = 225;
-
             if (turnDone) {
                 state = is_marker_found;
                 turnDone = false;
@@ -180,19 +165,7 @@ void loop() {
             } 
             break;
         case turn_to_marker:
-            // Controls variables
-            shutOffError = 0.04;
-            Kp = 3.5; // best 2.9
-            Ki = 6.0; // best 3.0
-            // I = 0.00;
-
-            Kp_slave = 3.5; //best 2.7  2.5 
-            Ki_slave =  1.0; // formerly 1.1
-            // I_slave = 0.00;
-
-            windUpTolerance = PI/2;         //PI/2.3
-            MAX_PWM = 175;
-
+            // float windUpTolerance = PI/2;
             Serial.println("turn_to_marker");
             if (turnDone) {
                 Serial.println("Finish marker Turn");
@@ -205,8 +178,7 @@ void loop() {
                 I_slave = 0;
                 I = 0;
 
-                if (abs(markerAngleRad) < markerAngleTolerance) {
-                  state = drive_to_marker;
+                if (foundCount >= 2){
                   Serial.println("turn_to_marker_done");
                   state = drive_to_marker;
                 }
@@ -214,17 +186,6 @@ void loop() {
             break;
         case drive_to_marker:
             Serial.println("drive_to_marker");
-            // Controls variables
-            float shutOffError = 0.03;
-            float Kp = 2.7; // best 2.9
-            float Ki = 3.0; // best 3.0
-            float I = 0.00;
-
-            float Kp_slave = 2.5; //best 2.7
-            float Ki_slave = 1.1; // formerly 1.1
-            float I_slave = 0.00;
-            MAX_PWM = 175;
-
             if (driveDone) {
                 Serial.println("drive done");
                 state = is_marker_found;
@@ -363,6 +324,7 @@ void drive(float desiredTheta, float time_start, float time_past) {
   drive_slave(thetaLeft, thetaRight, desiredTheta, masterVoltage, time_start, time_past);
 
 }
+
 /* 
   drive_master()
   PARAMETERS: 
@@ -424,14 +386,11 @@ float drive_master(float masterTheta, float SlaveTheta, float desiredTheta, floa
     }
 
     // make sure the voltage isn't more then the max voltage
-    if (voltage > maxVoltageMaster){
-      voltage = maxVoltageMaster;
+    if (voltage > maxVoltage){
+      voltage = maxVoltage;
     }
     // assign the voltage value to the motor
-    analogWrite(motorLVolt, round(abs(voltage/maxBattery) * MAX_PWM));
-    Serial.print("Master: ");
-    Serial.print(voltage);
-    Serial.print("\t");
+    analogWrite(motorLVolt, round(abs(voltage/maxVoltage) * MAX_PWM));
     driveDoneTime = millis();
   }
 
@@ -493,10 +452,7 @@ void drive_slave(float masterTheta, float slaveTheta, float desiredTheta, float 
     }
 
     // assign the voltage value to the motor
-    analogWrite(motorRVolt, round(abs(voltage/maxBattery) * MAX_PWM));
-    Serial.print("follower: ");
-    Serial.print(voltage);
-    Serial.println();
+    analogWrite(motorRVolt, round(abs(voltage/maxVoltageSlave) * MAX_PWM));
   }
 }
 
