@@ -486,7 +486,43 @@ class arducam:
         # check if markers were found
         dist = math.pow(math.pow(tvec[0][0][0], 2) + math.pow(tvec[0][0][1], 2) + math.pow(tvec[0][0][2], 2), 0.5) 
         return dist
-        # return tvec
+
+    def get_specific_marker_distance_and_angle(self, name="image.jpg", corners=None, ids=None, h=None, w=None, marker_id=None):
+        center = (w/2, h/2)
+        size = (w, h)
+        dist = 0
+        angle = 0
+
+        # getting the specific marker distance 
+        rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(corners, self.marker_size, self.mtx, self.dist)
+        dist = math.pow(math.pow(tvec[0][0][0], 2) + math.pow(tvec[0][0][1], 2) + math.pow(tvec[0][0][2], 2), 0.5) 
+
+        # getting the specific marker angle
+        if ids is not None:
+            # loop through if there are multiple markers
+
+            for x in range(len(ids)):
+                # find the mix right side and min left side
+                min_x = 100000
+                max_x = 0
+                for i in range(len(corners[0][0])):
+                    if corners[x][0][i][0] < min_x:
+                        min_x = corners[0][0][i][0]
+                    if corners[x][0][i][0] > max_x:
+                        max_x = corners[0][0][i][0]
+
+                # find the center of the aruco marker
+                centerObject = (min_x + max_x) / 2
+
+                # if the center of the aruco marker is less than the center of the image
+                # then the aruco marker is to the left of the center of the image making the angle negative
+                if centerObject < center[0]:
+                    angle = -1 * (self.FOV_X / 2) * ( (abs(centerObject - center[0])) / (abs(center[0] - size[0])) )
+                else:
+                    angle = (self.FOV_X / 2) * ( (abs(centerObject - center[0])) / (abs(center[0] - size[0])) )
+
+        # return the desired information
+        return dist, angle
 
 
 
@@ -511,6 +547,7 @@ if __name__ == "__main__":
 
             # if there are ids
             if ids is not None:
+                print("ids: ", ids)
                 # detect the distance
                 # dist = cam.get_marker_distance_func("image.jpg", corners, ids, h, w)
                 dist = cam.get_marker_angle("image.jpg", corners, ids, h, w)
