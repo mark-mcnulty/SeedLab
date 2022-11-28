@@ -120,7 +120,7 @@ if __name__ == "__main__":
             Satan.is_the_marker_there()
 
             # change the state if the correct marker is there
-            if Satan.marker_is_there:
+            if Satan.__marker_found:
                 Satan.set_state(States.SEND)
             else:
                 Satan.set_state(States.IS_DONE)
@@ -138,9 +138,9 @@ if __name__ == "__main__":
 
         elif Satan.get_state() == States.INC_ID:
             print("inc id")
-            Satan.current_marker_id += 1
+            Satan.__current_marker_id += 1
             Satan.set_state(States.LOOK)
-            
+
         else:
             print("error")
     
