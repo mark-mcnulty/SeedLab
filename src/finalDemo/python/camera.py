@@ -550,10 +550,12 @@ if __name__ == "__main__":
                 print("ids: ", ids)
                 # detect the distance
                 dist = cam.get_marker_distance_func(corners=corners, ids=ids, h=h, w=w)
-                # dist = cam.get_marker_angle("image.jpg", corners, ids, h, w)
+                angle = cam.get_marker_angle("image.jpg", corners, ids, h, w)
 
 
-            print(dist)
+            print("distance:", dist)
+            print("angle:", angle)
+            print()
 
         # if there is a keyboard interrupt exit program
         except KeyboardInterrupt:
