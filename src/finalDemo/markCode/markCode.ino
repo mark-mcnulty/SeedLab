@@ -86,7 +86,7 @@ float markerAngle = 0;
 float markerAngleRad = PI/2;
 float markerDistance = 100;
 float markerDistanceTheta = markerDistance / r;
-int driveCorrect = 3; // cm
+int driveCorrect = 0; // cm
 
 // for i2c communication
 char temp[32];
@@ -123,9 +123,8 @@ void setup() {
   // initialize i2c as slave
   Wire.begin(SLAVE_ADDRESS);
 
-//   // define callbacks for i2c communication
+  // define callbacks for i2c communication
   Wire.onReceive(receiveEvent);
-//   // Wire.onRequest(requestEvent);
 }
 
 
@@ -139,10 +138,10 @@ void loop() {
     switch (state) {
         case start:
             state = is_marker_found;
-            Serial.println("Start");
+            // Serial.println("Start");
             break;
         case is_marker_found:
-            Serial.println("is_marker_found");
+            // Serial.println("is_marker_found");
             motorRight.write(0);
             motorLeft.write(0);
             if (markerFound) {
@@ -164,8 +163,8 @@ void loop() {
 
             windUpTolerance = PI;         //PI/2
             MAX_PWM = 200;
-            // windUpTolerance = PI/6.5;
-            Serial.println("turn_to_find");
+
+            // Serial.println("turn_to_find");
             if (turnDone) {
                 state = is_marker_found;
                 turnDone = false;
@@ -191,9 +190,9 @@ void loop() {
             windUpTolerance = PI;         //PI/2
             MAX_PWM = 200;
 
-            Serial.println("turn_to_marker");
+            // Serial.println("turn_to_marker");
             if (turnDone) {
-                Serial.println("turn_to_marker_done");
+                // Serial.println("turn_to_marker_done");
                 state = drive_to_marker;
                 motorRight.write(0);
                 motorLeft.write(0);
@@ -207,17 +206,15 @@ void loop() {
             shutOffError = 0.01;
             Kp = 2.9; // best 2.9
             Ki = 3.0; // best 3.0
-            // I = 0.00;
 
             Kp_slave = 2.7; //best 2.7  2.5 
             Ki_slave =  2.0; // formerly 1.1
-            // I_slave = 0.00;
 
             windUpTolerance = PI/2;         //PI/2.3
             MAX_PWM = 175;
-            Serial.println("drive_to_marker");
+            // Serial.println("drive_to_marker");
             if (driveDone) {
-                Serial.println("drive done");
+                // Serial.println("drive done");
                 state = is_marker_found;
                 
                 // reset the marker found flag
@@ -280,6 +277,8 @@ void loop() {
   // this will add a delay between operations
   while (millis() < time_start + period); // change this to if
 }
+
+
 /* 
 DATA FROM PI
 */
@@ -302,6 +301,7 @@ void receiveEvent(int howMany) {
   markerDistanceTheta = (distanceTemp.toFloat() - driveCorrect) / r ;
   markerAngleRad = (angleTemp.toFloat() * PI) / 180 ;
   markerFound = true;
+
   Serial.print("distance: ");
   Serial.print(markerDistanceTheta);
   Serial.println();
@@ -309,20 +309,6 @@ void receiveEvent(int howMany) {
   Serial.print(markerAngleRad);
   Serial.println();
 }
-
-/* 
-SENDING TO PI
-*/
-// void requestEvent() {
-//   Serial.println("requested");
-//   if(turnDriveDone == true){
-//     Wire.write("1");
-//     turnDriveDone = false;
-//   }
-//   else{
-//     Wire.write("0");
-//   }
-// }
 
 
 /* 
@@ -391,7 +377,6 @@ float drive_master(float masterTheta, float SlaveTheta, float desiredTheta, floa
     // check if the time is greater then the delta time
       if (currentTime > driveDoneTime + deltaDone) {
       // set the drive done flag
-      Serial.println("state finish");
       driveDone = true;
     }
 
@@ -421,9 +406,6 @@ float drive_master(float masterTheta, float SlaveTheta, float desiredTheta, floa
     }
     // assign the voltage value to the motor
     analogWrite(motorLVolt, round(abs(voltage/maxBattery) * MAX_PWM));
-    Serial.print("Master: ");
-    Serial.print(voltage);
-    Serial.print("\t");
     driveDoneTime = millis();
   }
 
@@ -486,9 +468,6 @@ void drive_slave(float masterTheta, float slaveTheta, float desiredTheta, float 
 
     // assign the voltage value to the motor
     analogWrite(motorRVolt, round(abs(voltage/maxBattery) * MAX_PWM));
-    Serial.print("follower: ");
-    Serial.print(voltage);
-    Serial.println();
   }
 }
 
@@ -544,12 +523,10 @@ float turn_master(float masterTheta, float slaveTheta, float desiredTheta, float
     if (error > windUpTolerance){
       I = 0;
       voltage = error * Kp;
-      Serial.println("dont integrate");
     } else {
       // use integrator
       I = I + error * ((time_start - time_past)/1000);
       voltage = (error * Kp) + (Ki * I);
-      Serial.println(I);
     }
 
     // check if the voltage is too high
@@ -584,12 +561,6 @@ void turn_slave(float masterTheta, float slaveTheta, float desiredTheta, float m
   // calculate the error off the master
   error_right_turn = masterTheta - abs(slaveTheta);
   error_left_turn = abs(masterTheta) - slaveTheta;
-
-  // print both of the errors
-  // Serial.print(error_left_turn);
-  // Serial.print("\t");
-  // Serial.print(error_right_turn);
-  // Serial.println();
 
   // assign the direction it needs to turn
   // desiredTheta > 0 -> turn right -> have R LOW
