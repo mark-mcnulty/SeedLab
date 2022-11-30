@@ -73,7 +73,7 @@ if __name__ == "__main__":
 
 
     detected = False
-    amgleOld = None
+    angleOld = None
 
     try: 
         while True:
