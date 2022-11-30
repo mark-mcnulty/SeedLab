@@ -1,18 +1,10 @@
 import camera
 import smbus
 import time
+
+
 ids = []
-
-turnDriveDone = False
 address = 0x04
-
-def wait():
-    # number = bus.read_byte_data(address)
-    number = bus.self._bus.read_byte(address) & 0xff
-    time.sleep(5)
-    print(number)
-    if number == 1:
-        turnDriveDone = True
 
 def look_and_calc(cam):
     # take picture
@@ -76,17 +68,23 @@ if __name__ == "__main__":
     state = "look_and_calc"
     angle = 0
     distance = 0
+
+    sendTolerance = 0.5
+
+
     detected = False
+    amgleOld = None
 
     try: 
         while True:
             if state == "look_and_calc":
-                turnDriveDone = False
                 detected, angle, distance = look_and_calc(cam)
 
                 # switch to send state
                 if detected:
-                    state = "send"
+                    if angleOld - angle < sendTolerance:
+                        state = "send"
+                    angleOld = angle
 
             elif state == "send":
                 send(bus, angle, distance)
@@ -95,13 +93,6 @@ if __name__ == "__main__":
                 # switch to look_and_calc
                 state = "look_and_calc"
 
-            elif state == "wait":
-                wait()
-                if turnDriveDone:
-                    # reset turnDriveDone
-                    turnDriveDone = False
-                    # go to next state
-                    state = "look_and_calc"
 
     except KeyboardInterrupt:
         print("Exiting...")
