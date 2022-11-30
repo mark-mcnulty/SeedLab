@@ -167,11 +167,11 @@ void loop() {
         case turn_to_marker:
             // Controls variables
             shutOffError = 0.01;
-            Kp = 2.7; // best 2.9
+            Kp = 2.9; // best 2.9
             Ki = 3.0; // best 3.0
             // I = 0.00;
 
-            Kp_slave = 2.5; //best 2.7  2.5 
+            Kp_slave = 2.75 //best 2.7  2.5 
             Ki_slave = 2.0; // formerly 1.1
             // I_slave = 0.00;
 
@@ -192,12 +192,12 @@ void loop() {
 
             // Controls variables
             shutOffError = 0.01;
-            Kp = 2.3; // best 2.9
+            Kp = 2.9; // best 2.9
             Ki = 3.0; // best 3.0
             // I = 0.00;
 
-            Kp_slave = 3.5; //best 2.7  2.5 
-            Ki_slave =  1.0; // formerly 1.1
+            Kp_slave = 2.7; //best 2.7  2.5 
+            Ki_slave =  2.0; // formerly 1.1
             // I_slave = 0.00;
 
             windUpTolerance = PI/2;         //PI/2.3
