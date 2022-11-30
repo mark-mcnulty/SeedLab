@@ -87,6 +87,7 @@ if __name__ == "__main__":
                     angleOld = angle
 
             elif state == "send":
+                print("sending", angle, distance)
                 send(bus, angle, distance)
                 detected = False
 
