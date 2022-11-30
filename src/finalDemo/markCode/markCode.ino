@@ -189,8 +189,8 @@ void loop() {
             // I_slave = 0.00;
 
             windUpTolerance = PI;         //PI/2
-            MAX_PWM = 175;
-            // float windUpTolerance = PI/2;
+            MAX_PWM = 200;
+
             Serial.println("turn_to_marker");
             if (turnDone) {
                 Serial.println("turn_to_marker_done");

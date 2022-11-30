@@ -549,8 +549,8 @@ if __name__ == "__main__":
             if ids is not None:
                 print("ids: ", ids)
                 # detect the distance
-                # dist = cam.get_marker_distance_func("image.jpg", corners, ids, h, w)
-                dist = cam.get_marker_angle("image.jpg", corners, ids, h, w)
+                dist = cam.get_marker_distance_func(corners=corners, ids=ids, h=h, w=w)
+                # dist = cam.get_marker_angle("image.jpg", corners, ids, h, w)
 
 
             print(dist)
