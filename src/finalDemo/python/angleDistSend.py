@@ -84,8 +84,8 @@ if __name__ == "__main__":
                 if detected:
                     if angleOld is None:
                         angleOld = angle
-                        break
-                    if angleOld - angle < sendTolerance:
+                        
+                    elif abs(angleOld - angle) < sendTolerance:
                         state = "send"
                     angleOld = angle
 
