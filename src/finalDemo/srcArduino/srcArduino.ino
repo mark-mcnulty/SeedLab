@@ -151,6 +151,18 @@ void loop() {
             }
             break;
         case turn_to_find:
+            // Controls variables
+            shutOffError = 0.1;
+            Kp = 2.9; 
+            Ki = 3.0; 
+            
+
+            Kp_slave = 2.75; //best 2.7  2.5 
+            Ki_slave = 2.0; // formerly 1.1
+            
+
+            windUpTolerance = PI;         //PI/2
+            MAX_PWM = 175;
             // windUpTolerance = PI/6.5;
             Serial.println("turn_to_find");
             if (turnDone) {
