@@ -171,7 +171,7 @@ void loop() {
             Ki = 3.0; // best 3.0
             // I = 0.00;
 
-            Kp_slave = 2.75 //best 2.7  2.5 
+            Kp_slave = 2.75; //best 2.7  2.5 
             Ki_slave = 2.0; // formerly 1.1
             // I_slave = 0.00;
 

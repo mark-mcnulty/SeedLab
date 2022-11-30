@@ -82,6 +82,9 @@ if __name__ == "__main__":
 
                 # switch to send state
                 if detected:
+                    if angleOld is None:
+                        angleOld = angle
+                        break
                     if angleOld - angle < sendTolerance:
                         state = "send"
                     angleOld = angle

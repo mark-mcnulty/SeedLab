@@ -70,7 +70,7 @@ typedef enum {
 states state = start;
 
 // flags for states
-volatile bool markerFound = true;
+volatile bool markerFound = false;
 bool turnDone = false;
 bool driveDone = false;
 bool turnDriveDone = false;
@@ -120,10 +120,10 @@ void setup() {
 
   // setup communication
   // initialize i2c as slave
-  Wire.begin(SLAVE_ADDRESS);
+//   Wire.begin(SLAVE_ADDRESS);
 
-   // define callbacks for i2c communication
-  Wire.onReceive(receiveEvent);
+//   // define callbacks for i2c communication
+//   Wire.onReceive(receiveEvent);
 //   // Wire.onRequest(requestEvent);
 }
 
@@ -167,11 +167,11 @@ void loop() {
         case turn_to_marker:
             // Controls variables
             shutOffError = 0.01;
-            Kp = 2.7; // best 2.9
+            Kp = 2.9; // best 2.9
             Ki = 3.0; // best 3.0
             // I = 0.00;
 
-            Kp_slave = 2.5; //best 2.7  2.5 
+            Kp_slave = 2.75; //best 2.7  2.5 
             Ki_slave = 2.0; // formerly 1.1
             // I_slave = 0.00;
 
@@ -192,12 +192,12 @@ void loop() {
 
             // Controls variables
             shutOffError = 0.01;
-            Kp = 2.3; // best 2.9
+            Kp = 2.9; // best 2.9
             Ki = 3.0; // best 3.0
             // I = 0.00;
 
-            Kp_slave = 3.5; //best 2.7  2.5 
-            Ki_slave =  1.0; // formerly 1.1
+            Kp_slave = 2.7; //best 2.7  2.5 
+            Ki_slave =  2.0; // formerly 1.1
             // I_slave = 0.00;
 
             windUpTolerance = PI/2;         //PI/2.3
@@ -270,34 +270,32 @@ void loop() {
 /* 
 DATA FROM PI
 */
-void receiveEvent(int howMany) {
+// void receiveEvent(int howMany) {
 
-  for (int i = 0; i < howMany; i++) {
-    temp[i] = Wire.read();
-    temp[i + 1] = '\0'; //add null after ea. char
-  }
+//   for (int i = 0; i < howMany; i++) {
+//     temp[i] = Wire.read();
+//     temp[i + 1] = '\0'; //add null after ea. char
+//   }
 
-  //RPi first byte is cmd byte so shift everything to the left 1 pos so temp contains our string
-  for (int i = 0; i < howMany; ++i) {
-    temp[i] = temp[i + 1];
-  }
-  swag = temp ;
-  index = swag.indexOf(' ') ;
-  len = swag.length() ;
-  distanceTemp = swag.substring(0,index) ;
-  angleTemp = swag.substring(index, len - 1) ;
-  markerDistanceTheta = (distanceTemp.toFloat() - driveCorrect) / r ;
-  markerAngleRad = (angleTemp.toFloat() * PI) / 180 ;
-  markerFound = true;
-
-
-  Serial.print("distance: ");
-  Serial.print(markerDistanceTheta);
-  Serial.println();
-  Serial.print("angle: ");
-  Serial.print(markerAngleRad);
-  Serial.println();
-}
+//   //RPi first byte is cmd byte so shift everything to the left 1 pos so temp contains our string
+//   for (int i = 0; i < howMany; ++i) {
+//     temp[i] = temp[i + 1];
+//   }
+//   swag = temp ;
+//   index = swag.indexOf(' ') ;
+//   len = swag.length() ;
+//   distanceTemp = swag.substring(0,index) ;
+//   angleTemp = swag.substring(index, len - 1) ;
+//   markerDistanceTheta = (distanceTemp.toFloat() - driveCorrect) / r ;
+//   markerAngleRad = (angleTemp.toFloat() * PI) / 180 ;
+//   markerFound = true;
+//   Serial.print("distance: ");
+//   Serial.print(markerDistanceTheta);
+//   Serial.println();
+//   Serial.print("angle: ");
+//   Serial.print(markerAngleRad);
+//   Serial.println();
+// }
 
 /* 
 SENDING TO PI
