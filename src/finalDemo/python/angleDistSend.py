@@ -67,10 +67,12 @@ state_dictionary = {
 
 # create main loop
 if __name__ == "__main__":
+    # create the object
     bus = smbus.SMBus(1)
     cam = camera.arducam()
     print("activated camera")
     
+    # create variables
     state = "look_and_calc"
     angle = 0
     distance = 0
