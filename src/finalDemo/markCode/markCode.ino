@@ -80,9 +80,10 @@ float deltaDone = 1500;  // time in ms
 float currentTime = 0;
 
 // data from pi about marker
+float noMarkerAngle = (50 * PI) / 180;       // rads
+
 float markerAngle = 0;
 float markerAngleRad = PI/2;
-float noMarkerAngle = PI/6;       // rads
 float markerDistance = 100;
 float markerDistanceTheta = markerDistance / r;
 int driveCorrect = 3; // cm
@@ -162,7 +163,7 @@ void loop() {
             
 
             windUpTolerance = PI;         //PI/2
-            MAX_PWM = 175;
+            MAX_PWM = 200;
             // windUpTolerance = PI/6.5;
             Serial.println("turn_to_find");
             if (turnDone) {

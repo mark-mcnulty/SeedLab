@@ -1,11 +1,10 @@
 import camera
 import smbus
 import time
+
+
 ids = []
-
-
 address = 0x04
-
 
 def look_and_calc(cam):
     # take picture
@@ -60,26 +59,38 @@ state_dictionary = {
 
 # create main loop
 if __name__ == "__main__":
+    # create the object
     bus = smbus.SMBus(1)
     cam = camera.arducam()
     print("activated camera")
     
+    # create variables
     state = "look_and_calc"
     angle = 0
     distance = 0
+
+    sendTolerance = 0.5
+
+
     detected = False
+    angleOld = None
 
     try: 
         while True:
             if state == "look_and_calc":
-                turnDriveDone = False
                 detected, angle, distance = look_and_calc(cam)
 
                 # switch to send state
                 if detected:
-                    state = "send"
+                    if angleOld is None:
+                        angleOld = angle
+                        
+                    elif abs(angleOld - angle) < sendTolerance:
+                        state = "send"
+                    angleOld = angle
 
             elif state == "send":
+                print("sending", angle, distance)
                 send(bus, angle, distance)
                 detected = False
 
