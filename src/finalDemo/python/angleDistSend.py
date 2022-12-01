@@ -23,7 +23,6 @@ def look_and_calc(cam):
     # check if the markers are found
     if ids is not None:
         # calculate the angle
-        print("found")
         detected = True
         angle = cam.get_marker_angle("image.jpg", corners, ids, h, w)
         distance = cam.get_marker_distance_func("image.jpg", corners, ids, h, w)
@@ -35,12 +34,13 @@ def look_and_calc(cam):
 
 def send(bus, angle, distance):
     try:
+        print("distance: " + str(distance))
+        print("angle: " + str(angle))
         distance = round(distance, 2)
         angle = round(angle, 2)
         temp = str(distance) + " " + str(angle)
         byteValue = StringToBytes(temp)
         bus.write_i2c_block_data(0x04, 0, byteValue)
-        print(str(angle) + " " + str(distance))
         time.sleep(0.5)
     except:
         print("Error")
