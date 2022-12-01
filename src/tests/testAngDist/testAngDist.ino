@@ -1,14 +1,14 @@
 #include <Wire.h>
 #include <Encoder.h>
-#include <String.h>
+// #include <String.h>
 
 #define SLAVE_ADDRESS 0x04
 
-float r = 7.5;
+float r = 7.5;      // wheel radius in cm
 float markerAngle = 0;
 float markerAngleRad = 0;
 float markerDistance = 0;
-float markerDistanceTheta = markerDistance / r;
+float markerDistanceTheta = 0;
 int driveCorrect = 0; // cm
 
 volatile bool markerFound = false;
@@ -50,22 +50,21 @@ void receiveEvent(int howMany) {
     temp[i + 1] = '\0'; //add null after ea. char
   }
 
+
   //RPi first byte is cmd byte so shift everything to the left 1 pos so temp contains our string
   for (int i = 0; i < howMany; ++i) {
     temp[i] = temp[i + 1];
   }
+    // getting the right data here
+
   swag = temp ;
   index = swag.indexOf(' ') ;
   len = swag.length() ;
   distanceTemp = swag.substring(0,index) ;
-  angleTemp = swag.substring(index, len - 1) ;
-  markerDistanceTheta = (distanceTemp.toFloat() - driveCorrect) / r ;
+  angleTemp = swag.substring(index + 1, len) ;
+
+  markerDistanceTheta = (distanceTemp.toFloat()) / r ;
   markerAngleRad = (angleTemp.toFloat() * PI) / 180 ;
   markerFound = true;
-  Serial.print("distance: ");
-  Serial.print(markerDistanceTheta);
-  Serial.println();
-  Serial.print("angle: ");
-  Serial.print(markerAngleRad);
-  Serial.println();
+
 }

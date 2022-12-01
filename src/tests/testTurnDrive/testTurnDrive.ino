@@ -42,7 +42,7 @@ float Ki = 3.0; // best 3.0
 float I = 0.00;
 
 float Kp_slave = 3.3; //best 2.7  2.5 
-float Ki_slave = 0.3; // formerly 1.1
+float Ki_slave = 1.1; // formerly 1.1
 float I_slave = 0.00;
 
 float windUpTolerance = PI/2;         //PI/2.3
@@ -118,13 +118,6 @@ void setup() {
   analogWrite(motorLVolt, 0);
   analogWrite(motorRVolt, 0);
 
-  // setup communication
-  // initialize i2c as slave
-  Wire.begin(SLAVE_ADDRESS);
-
-   // define callbacks for i2c communication
-  Wire.onReceive(receiveEvent);
-//   // Wire.onRequest(requestEvent);
 }
 
 
@@ -151,23 +144,13 @@ void loop() {
             }
             break;
         case turn_to_find:
-            // Controls variables
-            shutOffError = 0.01;
-            Kp = 2.7; // best 2.9
-            Ki = 3.0; // best 3.0
-            // I = 0.00;
-
-            Kp_slave = 2.5; //best 2.7  2.5 
-            Ki_slave = .5; // formerly 1.1
-            // I_slave = 0.00;
-
-            windUpTolerance = PI/6;         //PI/2
-            MAX_PWM = 175;
-            // float windUpTolerance = PI/2;
-            Serial.println("turn_to_marker");
+            // windUpTolerance = PI/6.5;
+            Serial.println("turn_to_find");
             if (turnDone) {
-                Serial.println("turn_to_marker_done");
-                state = drive_to_marker;
+                state = is_marker_found;
+                turnDone = false;
+
+                // reset motor position
                 motorRight.write(0);
                 motorLeft.write(0);
                 I_slave = 0;
@@ -177,11 +160,11 @@ void loop() {
         case turn_to_marker:
             // Controls variables
             shutOffError = 0.01;
-            Kp = 2.7; // best 2.9
+            Kp = 2.9; // best 2.9
             Ki = 3.0; // best 3.0
             // I = 0.00;
 
-            Kp_slave = 2.5; //best 2.7  2.5 
+            Kp_slave = 2.75; //best 2.7  2.5 
             Ki_slave = 2.0; // formerly 1.1
             // I_slave = 0.00;
 
@@ -202,12 +185,12 @@ void loop() {
 
             // Controls variables
             shutOffError = 0.01;
-            Kp = 2.3; // best 2.9
+            Kp = 2.9; // best 2.9
             Ki = 3.0; // best 3.0
             // I = 0.00;
 
-            Kp_slave = 3.5; //best 2.7  2.5 
-            Ki_slave =  1.0; // formerly 1.1
+            Kp_slave = 2.7; //best 2.7  2.5 
+            Ki_slave =  2.0; // formerly 1.1
             // I_slave = 0.00;
 
             windUpTolerance = PI/2;         //PI/2.3
@@ -277,52 +260,6 @@ void loop() {
   // this will add a delay between operations
   while (millis() < time_start + period); // change this to if
 }
-/* 
-DATA FROM PI
-*/
-void receiveEvent(int howMany) {
-
-  for (int i = 0; i < howMany; i++) {
-    temp[i] = Wire.read();
-    temp[i + 1] = '\0'; //add null after ea. char
-  }
-
-  //RPi first byte is cmd byte so shift everything to the left 1 pos so temp contains our string
-  for (int i = 0; i < howMany; ++i) {
-    temp[i] = temp[i + 1];
-  }
-  swag = temp ;
-  index = swag.indexOf(' ') ;
-  len = swag.length() ;
-  distanceTemp = swag.substring(0,index) ;
-  angleTemp = swag.substring(index, len - 1) ;
-  markerDistanceTheta = (distanceTemp.toFloat() - driveCorrect) / r ;
-  markerAngleRad = (angleTemp.toFloat() * PI) / 180 ;
-  markerFound = true;
-
-
-  Serial.print("distance: ");
-  Serial.print(markerDistanceTheta);
-  Serial.println();
-  Serial.print("angle: ");
-  Serial.print(markerAngleRad);
-  Serial.println();
-}
-
-/* 
-SENDING TO PI
-*/
-// void requestEvent() {
-//   Serial.println("requested");
-//   if(turnDriveDone == true){
-//     Wire.write("1");
-//     turnDriveDone = false;
-//   }
-//   else{
-//     Wire.write("0");
-//   }
-// }
-
 
 /* 
 TURN STATE
