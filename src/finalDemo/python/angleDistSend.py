@@ -40,7 +40,7 @@ def send(bus, angle, distance):
         print(temp)
         byteValue = StringToBytes(temp)
         bus.write_i2c_block_data(0x04, 0, byteValue)
-        time.sleep(0.5)
+        time.sleep(0.75)
     except:
         print("Error")
 
