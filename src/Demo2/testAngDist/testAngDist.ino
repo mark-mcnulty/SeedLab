@@ -39,12 +39,7 @@ void setup(void) {
 
 
 void loop(void) {
-    Serial.print("distance: ");
-    Serial.print(markerDistanceTheta);
-    Serial.println();
-    Serial.print("angle: ");
-    Serial.print(markerAngleRad);
-    Serial.println();
+
 
 }
 
@@ -67,4 +62,10 @@ void receiveEvent(int howMany) {
   markerDistanceTheta = (distanceTemp.toFloat() - driveCorrect) / r ;
   markerAngleRad = (angleTemp.toFloat() * PI) / 180 ;
   markerFound = true;
+  Serial.print("distance: ");
+  Serial.print(markerDistanceTheta);
+  Serial.println();
+  Serial.print("angle: ");
+  Serial.print(markerAngleRad);
+  Serial.println();
 }
