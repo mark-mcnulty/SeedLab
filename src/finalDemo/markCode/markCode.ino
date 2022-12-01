@@ -80,12 +80,17 @@ float deltaDone = 1500;  // time in ms
 float currentTime = 0;
 
 // data from pi about marker
-float noMarkerAngle = (50 * PI) / 180;       // rads
+float noMarkerAngleDeg = 50;
+float noMarkerAngle = (noMarkerAngleDeg * PI) / 180;       // rads
 
 float markerAngle = 0;
-float markerAngleRad = PI/2;
-float markerDistance = 100;
-float markerDistanceTheta = markerDistance / r;
+float markerAngleRad = 0.0;
+float markerDistance = 0.0;
+float markerDistanceTheta = 0.0;
+
+float finalAngleRad = 0.0;
+float finalDistanceTheta = 0.0;
+
 int driveCorrect = 0; // cm
 
 // for i2c communication
@@ -134,17 +139,23 @@ void loop() {
     time_start = millis();
 
 
-    // control unit
+    /*
+    ***********************************************************************************************************************
+    CONTROL UNIT
+    */
     switch (state) {
         case start:
             state = is_marker_found;
-            // Serial.println("Start");
             break;
         case is_marker_found:
             // Serial.println("is_marker_found");
             motorRight.write(0);
             motorLeft.write(0);
             if (markerFound) {
+                // assign the final angle that the pi sent over 
+                finalAngleRad = markerAngleRad;
+                finalDistanceTheta = markerDistanceTheta;
+
                 state = turn_to_marker;
             } else {
                 state = turn_to_find;
@@ -179,13 +190,11 @@ void loop() {
         case turn_to_marker:
             // Controls variables
             shutOffError = 0.01;
-            Kp = 2.9; // best 2.9
-            Ki = 3.0; // best 3.0
-            // I = 0.00;
+            Kp = 2.9; 
+            Ki = 3.0; 
 
-            Kp_slave = 2.75; //best 2.7  2.5 
-            Ki_slave = 2.0; // formerly 1.1
-            // I_slave = 0.00;
+            Kp_slave = 2.75; 
+            Ki_slave = 2.0; 
 
             windUpTolerance = PI;         //PI/2
             MAX_PWM = 200;
@@ -204,11 +213,11 @@ void loop() {
 
             // Controls variables
             shutOffError = 0.01;
-            Kp = 2.9; // best 2.9
-            Ki = 3.0; // best 3.0
+            Kp = 2.9; 
+            Ki = 3.0; 
 
-            Kp_slave = 2.7; //best 2.7  2.5 
-            Ki_slave =  2.0; // formerly 1.1
+            Kp_slave = 2.7;  
+            Ki_slave =  2.0;
 
             windUpTolerance = PI/2;         //PI/2.3
             MAX_PWM = 175;
@@ -235,7 +244,10 @@ void loop() {
             break;
     }
 
-    // datapath
+    /*
+    *******************************************************************************************************************************
+    DATAPATH
+    */
     switch (state) {
         // start
         case start:
@@ -252,14 +264,12 @@ void loop() {
 
         // turn to the marker if the marker is found
         case turn_to_marker:
-            // Serial.println(markerAngleRad);
-            turn(markerAngleRad, time_start, time_past);
+            turn(finalAngleRad, time_start, time_past);
             break;
 
         // drive to the marker if the marker is found
-        case drive_to_marker:
-            // Serial.println(markerDistanceTheta);            
-            drive(markerDistanceTheta, time_start, time_past);
+        case drive_to_marker:         
+            drive(finalDistanceTheta, time_start, time_past);
             break;
 
         // stop
@@ -269,6 +279,9 @@ void loop() {
             Serial.println("defalut");
             break;
     }
+    /*
+    *******************************************************************************************************************************
+    */
 
 
     //Calculate robot position and velocity using given quations
