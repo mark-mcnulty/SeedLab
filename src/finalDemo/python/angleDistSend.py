@@ -20,7 +20,7 @@ def correct_angle_distortion(angle):
     
 
     # find what to add to the measured angle
-    if abs(angle) >= 5 and abs(angle) < 9:
+    if abs(angle) >= 4.5 and abs(angle) < 9:
         angle = (abs(angle) + 0.75) * sign
     elif abs(angle) >= 9 and abs(angle) < 12:
         angle = (abs(angle) + 1.5) * sign
