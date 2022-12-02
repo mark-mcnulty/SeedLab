@@ -34,6 +34,8 @@ float u;
 
 //Distance Variable
 float shutOffDistance = 5;
+int timeInTurn = 0;
+int maxTimeInTurn = 5000;
 
 // Controls variables
 volatile float shutOffError = 0.03;
@@ -157,6 +159,8 @@ void loop() {
                 finalDistanceTheta = markerDistanceTheta;
 
                 state = turn_to_marker;
+                timeInTurn = millis();
+
             } else {
                 state = turn_to_find;
             }
@@ -192,8 +196,8 @@ void loop() {
         case turn_to_marker:
             // Controls variables
             shutOffError = 0.025;
-            Kp = 2.9; 
-            Ki = 3.0; 
+            Kp = 3.5;     //3.0
+            Ki = 3.5;     //3.0 
 
             Kp_slave = 2.75; 
             Ki_slave = 2.0; 
@@ -202,13 +206,14 @@ void loop() {
             MAX_PWM = 225;
 
             // Serial.println("turn_to_marker");
-            if (turnDone) {
+            if (turnDone || (millis() - timeInTurn) > maxTimeInTurn) {
                 // Serial.println("turn_to_marker_done");
                 state = drive_to_marker;
                 motorRight.write(0);
                 motorLeft.write(0);
                 I_slave = 0;
                 I = 0;
+                timeInTurn = 0;
             } 
             break;
         case drive_to_marker:

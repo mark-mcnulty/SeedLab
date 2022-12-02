@@ -109,7 +109,7 @@ float currentTime = 0;
 float noMarkerAngleDeg = 50;
 float noMarkerAngle = (noMarkerAngleDeg * PI) / 180;       // rads
 
-float markerAngle = 25;
+float markerAngle = 26;
 float markerAngleRad = (markerAngle * PI) / 180;       
 
 float markerDistance = 0.0;
@@ -223,8 +223,8 @@ void loop() {
             Serial.println(I);
 
             // Controls variables
-            shutOffError = 0.025;
-            Kp = 2.9; 
+            shutOffError = 0.015;
+            Kp = 3.0; 
             Ki = 3.0; 
 
             Kp_slave = 2.75; 

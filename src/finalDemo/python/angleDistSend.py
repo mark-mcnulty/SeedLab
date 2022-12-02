@@ -6,6 +6,29 @@ ids = []
 
 address = 0x04
 
+def correct_angle_distortion(angle):
+    # get the sign
+    sign = 0
+    if angle < 0:
+        sign = -1
+    else:
+        sign = 1
+
+    # find what to add to the measured angle
+    if abs(angle) >= 5 and abs(angle) < 9:
+        angle = (abs(angle) + 0.75) * sign
+    elif abs(angle) >= 9 and abs(angle) < 12:
+        angle = (abs(angle) + 1.5) * sign
+    elif abs(angle) >= 12 and abs(angle) < 15:
+        angle = (abs(angle) + 2) * sign
+    elif abs(angle) >= 15 and abs(angle) < 20:
+        angle = (abs(angle) + 3) * sign
+    elif abs(angle) >= 20 and abs(angle) < 25:
+        angle = (abs(angle) + 2) * sign
+
+    return angle
+    
+
 
 def look_and_calc(cam):
     # take picture
@@ -25,6 +48,10 @@ def look_and_calc(cam):
         # calculate the angle
         detected = True
         angle = cam.get_marker_angle("image.jpg", corners, ids, h, w)
+
+        # angle correction
+        angle = correct_angle_distortion(angle)
+
         distance = cam.get_marker_distance_func("image.jpg", corners, ids, h, w)
 
         return detected, angle, distance
