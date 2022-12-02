@@ -1,4 +1,28 @@
+/*
 
+
+
+
+
+
+THE POINT OF THIS FILE IS TO TEST THE CONTROLS FOR TURNING NOTHING ELSE!!!!!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
 #include "DualMC33926MotorShield.h"
 #include <Wire.h>
 #include <Encoder.h>
@@ -67,13 +91,13 @@ typedef enum {
     turn_to_find,
     stop
     } states;
-states state = start;
+states state = drive_to_marker;
 
 // flags for states
-volatile bool markerFound = false;
-bool turnDone = false;
+volatile bool markerFound = true;
+bool turnDone = true;
 bool driveDone = false;
-bool turnDriveDone = false;
+
 float driveDoneTime = 0;
 float turnDoneTime = 0;
 float deltaDone = 1500;  // time in ms
@@ -85,13 +109,17 @@ float noMarkerAngle = (noMarkerAngleDeg * PI) / 180;       // rads
 
 float markerAngle = 0;
 float markerAngleRad = 0.0;
-float markerDistance = 0.0;
-float markerDistanceTheta = 0.0;
+
+/* 
+    alter the below code to test different distances
+*/
+float markerDistance = 100;
+float markerDistanceTheta = markerDistance / r;
 
 float finalAngleRad = 0.0;
 float finalDistanceTheta = 0.0;
 
-int driveCorrect = 3; // cm
+int driveCorrect = 0; // cm
 
 // for i2c communication
 char temp[32];
@@ -124,12 +152,6 @@ void setup() {
   analogWrite(motorLVolt, 0);
   analogWrite(motorRVolt, 0);
 
-  // setup communication
-  // initialize i2c as slave
-  Wire.begin(SLAVE_ADDRESS);
-
-  // define callbacks for i2c communication
-  Wire.onReceive(receiveEvent);
 }
 
 
@@ -161,8 +183,6 @@ void loop() {
                 state = turn_to_find;
             }
             break;
-
-
         case turn_to_find:
             // Controls variables
             shutOffError = 0.1;
@@ -191,7 +211,7 @@ void loop() {
             break;
         case turn_to_marker:
             // Controls variables
-            shutOffError = 0.025;
+            shutOffError = 0.01;
             Kp = 2.9; 
             Ki = 3.0; 
 
@@ -199,7 +219,7 @@ void loop() {
             Ki_slave = 2.0; 
 
             windUpTolerance = PI;         //PI/2
-            MAX_PWM = 225;
+            MAX_PWM = 200;
 
             // Serial.println("turn_to_marker");
             if (turnDone) {
@@ -226,13 +246,12 @@ void loop() {
             // Serial.println("drive_to_marker");
             if (driveDone) {
                 // Serial.println("drive done");
-                state = is_marker_found;
+                state = stop;                                               // FUCKING REMEMBER TO CHANGE THIS BACK
                 
                 // reset the marker found flag
                 turnDone = false;
                 driveDone = false;
                 markerFound = false;
-                turnDriveDone = true;
 
                 motorRight.write(0);
                 motorLeft.write(0);
@@ -241,6 +260,7 @@ void loop() {
             }
             break;
         case stop:
+            Serial.println("done");
             break;
         default:
             break;

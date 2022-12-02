@@ -1,3 +1,29 @@
+/*
+
+
+
+
+
+
+THE POINT OF THIS FILE IS TO TEST THE CONTROLS FOR TURNING NOTHING ELSE!!!!!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+
 
 #include "DualMC33926MotorShield.h"
 #include <Wire.h>
@@ -70,7 +96,7 @@ typedef enum {
 states state = start;
 
 // flags for states
-volatile bool markerFound = false;
+volatile bool markerFound = true;
 bool turnDone = false;
 bool driveDone = false;
 bool turnDriveDone = false;
@@ -83,15 +109,16 @@ float currentTime = 0;
 float noMarkerAngleDeg = 50;
 float noMarkerAngle = (noMarkerAngleDeg * PI) / 180;       // rads
 
-float markerAngle = 0;
-float markerAngleRad = 0.0;
+float markerAngle = 25;
+float markerAngleRad = (markerAngle * PI) / 180;       
+
 float markerDistance = 0.0;
 float markerDistanceTheta = 0.0;
 
 float finalAngleRad = 0.0;
 float finalDistanceTheta = 0.0;
 
-int driveCorrect = 3; // cm
+int driveCorrect = 0; // cm
 
 // for i2c communication
 char temp[32];
@@ -162,7 +189,7 @@ void loop() {
             }
             break;
 
-
+            
         case turn_to_find:
             // Controls variables
             shutOffError = 0.1;
@@ -189,7 +216,12 @@ void loop() {
                 I = 0;
             } 
             break;
+
+
         case turn_to_marker:
+            Serial.println("turning to marker");
+            Serial.println(I);
+
             // Controls variables
             shutOffError = 0.025;
             Kp = 2.9; 
@@ -198,19 +230,21 @@ void loop() {
             Kp_slave = 2.75; 
             Ki_slave = 2.0; 
 
-            windUpTolerance = PI;         //PI/2
+            windUpTolerance = PI;         
             MAX_PWM = 225;
 
-            // Serial.println("turn_to_marker");
             if (turnDone) {
                 // Serial.println("turn_to_marker_done");
-                state = drive_to_marker;
+                state = stop;
                 motorRight.write(0);
                 motorLeft.write(0);
                 I_slave = 0;
                 I = 0;
             } 
             break;
+
+
+
         case drive_to_marker:
 
             // Controls variables
@@ -241,6 +275,7 @@ void loop() {
             }
             break;
         case stop:
+            Serial.println("stop");
             break;
         default:
             break;
