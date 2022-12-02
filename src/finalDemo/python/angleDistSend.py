@@ -14,6 +14,11 @@ def correct_angle_distortion(angle):
     else:
         sign = 1
 
+    print("correcting angle")
+    # correct the angle
+    print("angle before correction: " + str(angle))
+    
+
     # find what to add to the measured angle
     if abs(angle) >= 5 and abs(angle) < 9:
         angle = (abs(angle) + 0.75) * sign
@@ -26,6 +31,7 @@ def correct_angle_distortion(angle):
     elif abs(angle) >= 20 and abs(angle) < 25:
         angle = (abs(angle) + 2) * sign
 
+    print("angle after correction: " + str(angle))
     return angle
     
 
